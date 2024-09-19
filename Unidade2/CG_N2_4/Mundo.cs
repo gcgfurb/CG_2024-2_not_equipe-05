@@ -4,6 +4,7 @@
 // #define CG_OpenTK
 // #define CG_DirectX      
 // #define CG_Privado  
+#define CG_Spline
 
 //FIXME: as diretivas parecem não funcionar direito. Aqui neste projeto sim, mas quando estão na CG_Biblioteca não funciona.
 
@@ -82,36 +83,36 @@ namespace gcgcg
       #endregion
 #endif
 
-      #region Objeto: polígono qualquer  
-      List<Ponto4D> pontosPoligono =
-      [
-        new Ponto4D(0.25, 0.25),
-        new Ponto4D(0.75, 0.25),
-        new Ponto4D(0.75, 0.75),
-        new Ponto4D(0.50, 0.50),
-        new Ponto4D(0.25, 0.75),
-      ];
-      objetoSelecionado = new Poligono(mundo, ref rotuloAtual, pontosPoligono);
-      #endregion
-      #region NÃO USAR: declara um objeto filho ao polígono
-      objetoSelecionado = new Ponto(objetoSelecionado, ref rotuloAtual, new Ponto4D(0.50, 0.75));
-      #endregion
-      #region Objeto: retângulo  
-      objetoSelecionado = new Retangulo(mundo, ref rotuloAtual, new Ponto4D(-0.25, 0.25), new Ponto4D(-0.75, 0.75))
-      {
-        PrimitivaTipo = PrimitiveType.LineLoop
-      };
-      #endregion
-      #region Objeto: segmento de reta  
-      objetoSelecionado = new SegReta(mundo, ref rotuloAtual, new Ponto4D(-0.25, -0.25), new Ponto4D(-0.75, -0.75));
-      #endregion
-      #region Objeto: ponto  
-      objetoSelecionado = new Ponto(mundo, ref rotuloAtual, new Ponto4D(0.25, -0.25))
-      {
-        PrimitivaTipo = PrimitiveType.Points,
-        PrimitivaTamanho = 10
-      };
-      #endregion
+      // #region Objeto: polígono qualquer  
+      // List<Ponto4D> pontosPoligono =
+      // [
+      //   new Ponto4D(0.25, 0.25),
+      //   new Ponto4D(0.75, 0.25),
+      //   new Ponto4D(0.75, 0.75),
+      //   new Ponto4D(0.50, 0.50),
+      //   new Ponto4D(0.25, 0.75),
+      // ];
+      // objetoSelecionado = new Poligono(mundo, ref rotuloAtual, pontosPoligono);
+      // #endregion
+      // #region NÃO USAR: declara um objeto filho ao polígono
+      // objetoSelecionado = new Ponto(objetoSelecionado, ref rotuloAtual, new Ponto4D(0.50, 0.75));
+      // #endregion
+      // #region Objeto: retângulo  
+      // objetoSelecionado = new Retangulo(mundo, ref rotuloAtual, new Ponto4D(-0.25, 0.25), new Ponto4D(-0.75, 0.75))
+      // {
+      //   PrimitivaTipo = PrimitiveType.LineLoop
+      // };
+      // #endregion
+      // #region Objeto: segmento de reta  
+      // objetoSelecionado = new SegReta(mundo, ref rotuloAtual, new Ponto4D(-0.25, -0.25), new Ponto4D(-0.75, -0.75));
+      // #endregion
+      // #region Objeto: ponto  
+      // objetoSelecionado = new Ponto(mundo, ref rotuloAtual, new Ponto4D(0.25, -0.25))
+      // {
+      //   PrimitivaTipo = PrimitiveType.Points,
+      //   PrimitivaTamanho = 10
+      // };
+      // #endregion
 
 #if CG_Privado
       #region Objeto: circulo - origem
@@ -135,6 +136,23 @@ namespace gcgcg
       #region Objeto: SplineInter
       objetoSelecionado = new SplineInter(mundo, ref rotuloAtual);
       #endregion
+#endif
+
+#if CG_Spline
+
+    #region Spline
+
+    List<Ponto4D> pontosAncora = new List<Ponto4D> {
+      new Ponto4D(0.25, -0.25),
+      new Ponto4D(0.5, 0.5),
+      new Ponto4D(0, 0),
+      new Ponto4D(-0.90, -0.5)
+    };
+    
+    objetoSelecionado = new Spline(mundo, ref rotuloAtual, pontosAncora, 10);
+
+    #endregion      
+
 #endif
 
     }
@@ -185,7 +203,7 @@ namespace gcgcg
         if (objetoSelecionado.PontosListaTamanho > 0)
         {
           objetoSelecionado.PontosAlterar(new Ponto4D(objetoSelecionado.PontosId(0).X + 0.005, objetoSelecionado.PontosId(0).Y, 0), 0);
-          objetoSelecionado.ObjetoAtualizar();
+          objetoSelecionado.Atualizar();
         }
       }
 
@@ -216,13 +234,13 @@ namespace gcgcg
           mouseMovtoUltimo = sruPonto;
 
           objetoSelecionado.PontosAlterar(new Ponto4D(objetoSelecionado.PontosId(0).X + deltaX, objetoSelecionado.PontosId(0).Y + deltaY, 0), 0);
-          objetoSelecionado.ObjetoAtualizar();
+          objetoSelecionado.Atualizar();
         }
       }
       if (estadoTeclado.IsKeyDown(Keys.LeftShift))
       {
         objetoSelecionado.PontosAlterar(sruPonto, 0);
-        objetoSelecionado.ObjetoAtualizar();
+        objetoSelecionado.Atualizar();
       }
 
       #endregion

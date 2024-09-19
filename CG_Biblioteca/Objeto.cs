@@ -52,7 +52,7 @@ namespace CG_Biblioteca
       }
     }
 
-    private void ObjetoAdicionar(Objeto objetoFilho)
+    public void ObjetoAdicionar(Objeto objetoFilho)
     {
       if (objetoFilho == null)
       {
@@ -64,7 +64,7 @@ namespace CG_Biblioteca
       }
     }
 
-    public void ObjetoAtualizar()
+    public virtual void Atualizar()
     {
       float[] vertices = new float[pontosLista.Count * 3];
       int ptoLista = 0;
@@ -146,19 +146,19 @@ namespace CG_Biblioteca
     public void PontosAdicionar(Ponto4D pto)
     {
       pontosLista.Add(pto);
-      ObjetoAtualizar();
+      Atualizar();
     }
 
-    public void PontosAlterar(Ponto4D pto, int posicao)
+    public virtual void PontosAlterar(Ponto4D pto, int posicao)
     {
       pontosLista[posicao] = pto;
-      ObjetoAtualizar();
+      Atualizar();
     }
 
     public void PontosApagar()
     {
       pontosLista.Clear();
-      ObjetoAtualizar();
+      Atualizar();
     }
 
     #endregion
