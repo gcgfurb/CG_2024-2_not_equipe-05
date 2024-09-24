@@ -33,9 +33,8 @@ namespace gcgcg
     List<Ponto4D> pontosRetorno = new List<Ponto4D>();      
 
       double coeficiente = 1/qtdPontos;
-    Console.WriteLine(coeficiente);
 
-      for (int t=0; t < qtdPontos; t++) {
+      for (int t=0; t <= qtdPontos; t++) {
 
         Ponto4D p0p1 = PontoSpline(pontos[0], pontos[1], t);
         Ponto4D p1p2 = PontoSpline(pontos[1], pontos[2], t);

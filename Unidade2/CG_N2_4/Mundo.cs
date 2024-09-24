@@ -143,13 +143,13 @@ namespace gcgcg
     #region Spline
 
     List<Ponto4D> pontosAncora = new List<Ponto4D> {
-      new Ponto4D(0.25, -0.25),
-      new Ponto4D(0.5, 0.5),
-      new Ponto4D(0, 0),
+      new Ponto4D(0.90, -0.25),
+      new Ponto4D(0.90, 0.5),
+      new Ponto4D(-0.90, 0.5),
       new Ponto4D(-0.90, -0.5)
     };
     
-    objetoSelecionado = new Spline(mundo, ref rotuloAtual, pontosAncora, 10);
+    objetoSelecionado = new Spline(mundo, ref rotuloAtual, pontosAncora, 50);
 
     #endregion      
 
