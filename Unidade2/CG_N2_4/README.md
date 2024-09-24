@@ -1,6 +1,6 @@
 # CG_N2
 
-Lembre que para usar os projetos no VSCode sempre abra o ```code-workspace``` (neste caso [CG_N2_Exemplo.code-workspace](CG_N2_Exemplo.code-workspace)) e manter o projeto ```CG_Biblioteca``` na pasta raiz deste repositório.
+Lembre que para usar os projetos no VSCode sempre abra o ```code-workspace``` (neste caso [CG_N2_2.code-workspace](CG_N2_2.code-workspace)) e manter o projeto ```CG_Biblioteca``` na pasta raiz deste repositório.
 
 ## Especificação  
 
@@ -10,7 +10,7 @@ A especificação deste projeto utilizou o [PlantUML](https://github.com/LDTTFUR
 
 ## Arquivos
 
-O exemplo de código ```CG_N2_Exemplo``` tem:
+O exemplo de código ```CG_N2_2``` tem:
 
 - .gitattributes e .gitignore: arquivos de controle do GitHub. São muito importantes para o uso correto do versionamento do código;  
 - .vscode: pasta com arquivos de configuração do VSCode;  
@@ -18,8 +18,8 @@ O exemplo de código ```CG_N2_Exemplo``` tem:
   - tasks.json: scripts para executar tarefas de compilação, depuração, execução e deploy do projeto;  
     - as tarefas podem ser executas usando: View / Command Palette / >Tasks: Run Task  
     - a tarefa para compilar pode ser executada usando: View / Command Palette / >Tasks: Run Build Task  
-- CG_N2_Exemplo.code-workspace: arquivo do workspace que inclui o projeto ```CG_N2_Exemplo``` e ```CG_Biblioteca```;  
-- CG_N2_Exemplo.csproj: arquivo do projeto;  
+- CG_N2_2.code-workspace: arquivo do workspace que inclui o projeto ```CG_N2_2``` e ```CG_Biblioteca```;  
+- CG_N2_2.csproj: arquivo do projeto;  
 - bin: pasta com arquivos binários gerados para execução;  
 - obj: pasta com arquivos binários gerados pela compilação;  
 - README.md: este arquivo com descrições no formato MarkDown;  
