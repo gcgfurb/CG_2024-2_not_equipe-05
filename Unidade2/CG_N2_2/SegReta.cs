@@ -25,7 +25,7 @@ namespace gcgcg
     private void Atualizar()
     {
 
-      base.ObjetoAtualizar();
+      base.Atualizar();
     }
 
 #if CG_Debug
