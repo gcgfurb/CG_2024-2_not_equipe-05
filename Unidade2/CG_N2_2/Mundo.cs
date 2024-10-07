@@ -22,9 +22,19 @@ namespace gcgcg
     private char rotuloAtual = '?';
     private Dictionary<char, Objeto> grafoLista = [];
     private Objeto objetoSelecionado = null;
-    // Declara variável
-    private bool isPrimeiro = true;
-    private int contador = 0;
+    private bool isFirst = true;
+    private int cont = 0;
+
+    private PrimitiveType[] primitiveTypes =
+{
+    PrimitiveType.Points,
+    PrimitiveType.Lines,
+    PrimitiveType.LineLoop,
+    PrimitiveType.LineStrip,
+    PrimitiveType.Triangles,
+    PrimitiveType.TriangleStrip,
+    PrimitiveType.TriangleFan
+};
 
     private readonly float[] _sruEixos =
         {
@@ -62,7 +72,7 @@ namespace gcgcg
 #endif
 
       // Cor
-            GL.ClearColor(0.50196f, 0.50196f, 0.50196f, 1.0f);
+      GL.ClearColor(0.50196f, 0.50196f, 0.50196f, 1.0f);
 
       #region Cores
       _shaderVermelha = new Shader("Shaders/shader.vert", "Shaders/shaderVermelha.frag");
@@ -87,7 +97,7 @@ namespace gcgcg
 
       #region Objeto: retângulo  
       objetoSelecionado = new Retangulo(mundo, ref rotuloAtual, new Ponto4D(-0.5, -0.5), new Ponto4D(0.5, 0.5));
-      objetoSelecionado.ShaderObjeto =  new Shader("Shaders/shader.vert", "Shaders/shaderMagenta.frag");
+      objetoSelecionado.ShaderObjeto = new Shader("Shaders/shader.vert", "Shaders/shaderMagenta.frag");
 
       #endregion
     }
@@ -97,7 +107,7 @@ namespace gcgcg
       base.OnRenderFrame(e);
 
       GL.Clear(ClearBufferMask.ColorBufferBit);
-            mundo.Desenhar(new Transformacao4D(), objetoSelecionado);
+      mundo.Desenhar(new Transformacao4D(), objetoSelecionado);
 
 
 #if CG_Gizmo
@@ -106,50 +116,18 @@ namespace gcgcg
       SwapBuffers();
     }
 
-    private void AlternaTipoPrimitivo()
+    private void UpdatePrimitiveType()
     {
-      switch (contador)
+      if (isFirst)
       {
-        case 0:
-          if (isPrimeiro)
-          {
-            isPrimeiro = false;
-            objetoSelecionado.PrimitivaTipo = PrimitiveType.Lines;
-            contador += 2;
-            break;
-          }
-          else
-          {
-            objetoSelecionado.PrimitivaTipo = PrimitiveType.Points;
-            contador++;
-            break;
-          }
-        case 1:
-          objetoSelecionado.PrimitivaTipo = PrimitiveType.Lines;
-          contador++;
-          break;
-        case 2:
-          objetoSelecionado.PrimitivaTipo = PrimitiveType.LineLoop;
-          contador++;
-          break;
-        case 3:
-          objetoSelecionado.PrimitivaTipo = PrimitiveType.LineStrip;
-          contador++;
-          break;
-        case 4:
-          objetoSelecionado.PrimitivaTipo = PrimitiveType.Triangles;
-          contador++;
-          break;
-        case 5:
-          objetoSelecionado.PrimitivaTipo = PrimitiveType.TriangleStrip;
-          contador++;
-          break;
-        case 6:
-          objetoSelecionado.PrimitivaTipo = PrimitiveType.TriangleFan;
-          contador = 0;
-          break;
-        default:
-          break;
+        objetoSelecionado.PrimitivaTipo = PrimitiveType.Lines;
+        isFirst = false;
+        cont = 1;
+      }
+      else
+      {
+        objetoSelecionado.PrimitivaTipo = primitiveTypes[cont];
+        cont = (cont + 1) % primitiveTypes.Length;
       }
     }
 
@@ -161,17 +139,21 @@ namespace gcgcg
       var estadoTeclado = KeyboardState;
       #endregion
 
+      if (KeyboardState.IsKeyDown(Keys.Escape))
+      {
+        Close();
+      }
+
       if (estadoTeclado.IsKeyPressed(Keys.Space))
       {
-        AlternaTipoPrimitivo();
+        UpdatePrimitiveType();
       }
-    
+
       // if (objetoSelecionado != null)
       //     Console.WriteLine(objetoSelecionado);
       // else
       //     Console.WriteLine("objetoSelecionado: MUNDO \n__________________________________\n");
-    
-   
+
     }
 
     protected override void OnResize(ResizeEventArgs e)
