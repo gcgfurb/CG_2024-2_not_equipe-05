@@ -22,6 +22,11 @@ namespace gcgcg
       Atualizar();
     }
 
+    private void Atualizar()
+    {
+
+      base.ObjetoAtualizar();
+    }
 
 #if CG_Debug
     public override string ToString()
