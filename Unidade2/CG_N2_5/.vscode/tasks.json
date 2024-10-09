@@ -7,7 +7,7 @@
       "type": "process",
       "args": [
         "build",
-        "${workspaceFolder}/CG_N2_Exemplo.csproj",
+        "${workspaceFolder}/CG_N2_5.csproj",
         "/property:GenerateFullPaths=true"
       ],
       "problemMatcher": "$msCompile"
@@ -18,7 +18,7 @@
       "type": "process",
       "args": [
         "publish",
-        "${workspaceFolder}/CG_N2_Exemplo.csproj",
+        "${workspaceFolder}/CG_N2_5.csproj",
         "/property:GenerateFullPaths=true"
       ],
       "problemMatcher": "$msCompile"
@@ -33,7 +33,7 @@
         "release",
         "-r",
         "win10-x64",
-        "${workspaceFolder}/CG_N2_Exemplo.csproj",
+        "${workspaceFolder}/CG_N2_5.csproj",
         "/property:GenerateFullPaths=true"
       ],
       "problemMatcher": "$msCompile"
@@ -48,7 +48,7 @@
         "release",
         "-r",
         "ubuntu.16.10-x64",
-        "${workspaceFolder}/CG_N2_Exemplo.csproj",
+        "${workspaceFolder}/CG_N2_5.csproj",
         "/property:GenerateFullPaths=true"
       ],
       "problemMatcher": "$msCompile"
@@ -63,7 +63,7 @@
         "release",
         "-r",
         "osx-x64",
-        "${workspaceFolder}/CG_N2_Exemplo.csproj",
+        "${workspaceFolder}/CG_N2_5.csproj",
         "/property:GenerateFullPaths=true"
       ],
       "problemMatcher": "$msCompile"
@@ -78,7 +78,7 @@
         "release",
         "-r",
         "osx-arm64",
-        "${workspaceFolder}/CG_N2_Exemplo.csproj",
+        "${workspaceFolder}/CG_N2_5.csproj",
         "/property:GenerateFullPaths=true"
       ],
       "problemMatcher": "$msCompile"
@@ -91,7 +91,7 @@
         "watch",
         "run",
         "--project",
-        "${workspaceFolder}/CG_N2_Exemplo.csproj"
+        "${workspaceFolder}/CG_N2_5.csproj"
       ],
       "problemMatcher": "$msCompile"
     }

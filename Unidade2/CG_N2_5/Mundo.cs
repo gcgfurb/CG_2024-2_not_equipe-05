@@ -11,7 +11,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Windowing.Desktop;
 using System;
 using System.Collections.Generic;
-// using OpenTK.Mathematics;
+using OpenTK.Mathematics;
 
 namespace gcgcg
 {
@@ -141,7 +141,7 @@ namespace gcgcg
             
             if (input.IsAnyKeyDown){
                 quadrado.PrimitivaTipo = PrimitiveType.Points; 
-                if(Matematica.distanciaQuadrado(pontoCentral, newPto) < Math.Pow(circuloMaior.raio, 2)) Atualizar(newPto);
+                if(Matematica.DistanciaQuadrado(pontoCentral, newPto) < Math.Pow(circuloMaior.raio, 2)) Atualizar(newPto);
             }
             #endregion
         }

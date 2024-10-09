@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <RootNamespace>gcgcg</RootNamespace>
-    <AssemblyName>CG_N2_Exemplo</AssemblyName>
+    <AssemblyName>CG_N2_5</AssemblyName>
     <TargetFramework>net8.0</TargetFramework>
     <PublishSingleFile>true</PublishSingleFile>
   </PropertyGroup>
@@ -13,11 +13,11 @@
 
   <ItemGroup>
     <PackageReference Include="OpenTK" Version="4.8.2" />
-    <PackageReference Include="StbImageSharp" Version="2.27.13" />
+    <PackageReference Include="StbImageSharp" Version="2.27.14" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CG_Biblioteca\CG_Biblioteca.csproj" />
+    <ProjectReference Include="..\..\CG_Biblioteca\CG_Biblioteca.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -4,7 +4,7 @@
 			"path": "."
 		},
 		{
-			"path": "../CG_Biblioteca"
+			"path": "../../CG_Biblioteca"
 		}
 	],
 	"settings": {
