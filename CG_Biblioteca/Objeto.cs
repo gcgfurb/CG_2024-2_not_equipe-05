@@ -52,6 +52,11 @@ namespace CG_Biblioteca
       }
     }
 
+    public void ObjetoAtualizar()
+    {
+      Atualizar();
+    }
+
     public void ObjetoAdicionar(Objeto objetoFilho)
     {
       if (objetoFilho == null)
