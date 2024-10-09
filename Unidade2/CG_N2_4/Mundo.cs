@@ -83,37 +83,6 @@ namespace gcgcg
       #endregion
 #endif
 
-      // #region Objeto: polígono qualquer  
-      // List<Ponto4D> pontosPoligono =
-      // [
-      //   new Ponto4D(0.25, 0.25),
-      //   new Ponto4D(0.75, 0.25),
-      //   new Ponto4D(0.75, 0.75),
-      //   new Ponto4D(0.50, 0.50),
-      //   new Ponto4D(0.25, 0.75),
-      // ];
-      // objetoSelecionado = new Poligono(mundo, ref rotuloAtual, pontosPoligono);
-      // #endregion
-      // #region NÃO USAR: declara um objeto filho ao polígono
-      // objetoSelecionado = new Ponto(objetoSelecionado, ref rotuloAtual, new Ponto4D(0.50, 0.75));
-      // #endregion
-      // #region Objeto: retângulo  
-      // objetoSelecionado = new Retangulo(mundo, ref rotuloAtual, new Ponto4D(-0.25, 0.25), new Ponto4D(-0.75, 0.75))
-      // {
-      //   PrimitivaTipo = PrimitiveType.LineLoop
-      // };
-      // #endregion
-      // #region Objeto: segmento de reta  
-      // objetoSelecionado = new SegReta(mundo, ref rotuloAtual, new Ponto4D(-0.25, -0.25), new Ponto4D(-0.75, -0.75));
-      // #endregion
-      // #region Objeto: ponto  
-      // objetoSelecionado = new Ponto(mundo, ref rotuloAtual, new Ponto4D(0.25, -0.25))
-      // {
-      //   PrimitivaTipo = PrimitiveType.Points,
-      //   PrimitivaTamanho = 10
-      // };
-      // #endregion
-
 #if CG_Privado
       #region Objeto: circulo - origem
       objetoSelecionado = new Circulo(mundo, ref rotuloAtual, 0.2)
@@ -149,7 +118,7 @@ namespace gcgcg
       new Ponto4D(-0.90, -0.5)
     };
     
-    objetoSelecionado = new Spline(mundo, ref rotuloAtual, pontosAncora, 50);
+    objetoSelecionado = new Spline(mundo, ref rotuloAtual, pontosAncora, 5);
 
     #endregion      
 
@@ -178,10 +147,7 @@ namespace gcgcg
       #region Teclado
       var estadoTeclado = KeyboardState;
       if (estadoTeclado.IsKeyDown(Keys.Escape))
-        Close();
-
-      if (estadoTeclado.IsKeyPressed(Keys.Space))
-        objetoSelecionado = Grafocena.GrafoCenaProximo(mundo, objetoSelecionado, grafoLista);
+        Close();        
 
       if (estadoTeclado.IsKeyPressed(Keys.G))
         Grafocena.GrafoCenaImprimir(mundo, grafoLista);
@@ -207,11 +173,22 @@ namespace gcgcg
         }
       }
 
-      if (estadoTeclado.IsKeyPressed(Keys.R) && objetoSelecionado != null)
-      {
-        //FIXME: Spline limpa os pontos da Spline, mas não limpa pontos e poliedro de controle 
-        objetoSelecionado.PontosApagar();
+      if (objetoSelecionado is Spline spline) {
+        if (estadoTeclado.IsKeyPressed(Keys.Space)) {
+          spline.MudarPontoAncoraSelecionado();
+        }
+
+        if (estadoTeclado.IsKeyPressed(Keys.M)) {
+          spline.AdicionarPontoSpline();
+        }
+
+        if (estadoTeclado.IsKeyPressed(Keys.N)) {
+          spline.RemoverPontoSpline();
+        }
+
+        spline.Atualizar();
       }
+
       #endregion
 
       #region  Mouse
@@ -242,7 +219,6 @@ namespace gcgcg
         objetoSelecionado.PontosAlterar(sruPonto, 0);
         objetoSelecionado.Atualizar();
       }
-
       #endregion
     }
 

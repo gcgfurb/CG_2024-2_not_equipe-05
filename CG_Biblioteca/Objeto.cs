@@ -64,6 +64,12 @@ namespace CG_Biblioteca
       }
     }
 
+    public void RemoverObjetosFilhos()
+    {
+      objetosLista.Clear();
+    }
+
+
     public virtual void Atualizar()
     {
       float[] vertices = new float[pontosLista.Count * 3];

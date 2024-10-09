@@ -10,23 +10,48 @@ namespace gcgcg
   internal class Spline : Objeto
   {
 
-    public List<Ponto4D> pontosAncora;
+    public List<Ponto4D> pontosAncoraPosicoes;
+
+    // public List<Ponto> pontosAncoraObjeto;
     private int qtdPontos;
+    private int indexPontoAncoraSelecionado = 0;
+
+    private List<Ponto> pontosAncora;
+
+    private Shader _shaderVermelha = new Shader("Shaders/shader.vert", "Shaders/shaderVermelha.frag");
+    private Shader _shaderBranca = new("Shaders/shader.vert", "Shaders/shaderBranca.frag");
 
     public Spline(Objeto _paiRef, ref char _rotulo, List<Ponto4D> pontosAncora, int qtdPontos) : base(_paiRef, ref _rotulo)
     {
       
+      this.pontosAncora = new List<Ponto>();
+
       foreach (Ponto4D ponto in pontosAncora ) {
-        base.ObjetoAdicionar(new Ponto(this, ref _rotulo, ponto));      
+        Ponto pontoAdicionado = new Ponto(this, ref _rotulo, ponto);
+        this.pontosAncora.Add(pontoAdicionado);
+
+        base.ObjetoAdicionar(pontoAdicionado);      
       }
+
+      this.pontosAncora[0].ShaderObjeto = _shaderVermelha;
 
       PrimitivaTipo = PrimitiveType.LineStrip;
       PrimitivaTamanho = 1;
 
-      this.pontosAncora = pontosAncora;
+      this.pontosAncoraPosicoes = pontosAncora;
       this.qtdPontos = qtdPontos;
       Atualizar();
     }
+
+    public void MudarPontoAncoraSelecionado() {
+      
+      pontosAncora[indexPontoAncoraSelecionado].ShaderObjeto = _shaderBranca;       
+      
+      indexPontoAncoraSelecionado = (indexPontoAncoraSelecionado += 1) % 4;
+
+      pontosAncora[indexPontoAncoraSelecionado].ShaderObjeto = _shaderVermelha;       
+    }
+
 
     private List<Ponto4D> CalcularPontosSpline(List<Ponto4D> pontos, int qtdPontos) {
 
@@ -58,17 +83,34 @@ namespace gcgcg
       return new Ponto4D(x, y);
     }
 
+    public void AdicionarPontoSpline() {
+      this.qtdPontos += 1;
+    }
+
+    public void RemoverPontoSpline() {
+      if (qtdPontos > 1) {
+        qtdPontos -= 1;
+      }
+    }
+
     public override void Atualizar()
     {
-      base.pontosLista = CalcularPontosSpline(this.pontosAncora, this.qtdPontos);
+      base.pontosLista = CalcularPontosSpline(this.pontosAncoraPosicoes, this.qtdPontos);
+      // this.AtualizarPontoAncoraSelecionado();
       base.Atualizar();
     }
 
     public override void PontosAlterar(Ponto4D pto, int posicao)
     {
-      pontosAncora[0] = pto;
-      pontosLista[posicao] = pto;
+      pontosAncoraPosicoes[indexPontoAncoraSelecionado] = pto;
+      pontosAncora[indexPontoAncoraSelecionado].PontosAlterar(pto, 0);
+
       Atualizar();
+    }
+
+    private void AtualizarPontoAncoraSelecionado() {
+
+
     }
 
 #if CG_Debug
