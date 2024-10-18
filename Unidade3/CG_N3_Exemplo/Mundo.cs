@@ -24,6 +24,8 @@ namespace gcgcg
     // private Objeto objetoNovo = null;
     private Transformacao4D matrizGrafo = new();
 
+    private List<Ponto4D> pontosNovoPoligono = new();
+
 #if CG_Gizmo
     private readonly float[] _sruEixos =
     [
@@ -173,7 +175,14 @@ namespace gcgcg
       // Quando pressionar a tecla Enter finaliza o desenho do novo polígono.  
       if (estadoTeclado.IsKeyPressed(Keys.Enter))
       {
-        Console.WriteLine("## 2. Estrutura de dados: polígono - Enter");
+        // Cria um novo polígono com os pontos armazenados
+        Objeto novoPoligono = new Poligono(mundo, ref rotuloAtual, pontosNovoPoligono);
+        // Adiciona o novo polígono à cena ou à lista de polígonos
+        grafoLista.Add(novoPoligono.Rotulo, novoPoligono);
+
+        // Limpa a lista de pontos para o próximo polígono
+        pontosNovoPoligono.Clear();
+        objetoSelecionado = null;
       }
 
       // ## 3. Estrutura de dados: polígono
@@ -181,12 +190,15 @@ namespace gcgcg
       if (estadoTeclado.IsKeyPressed(Keys.D) && objetoSelecionado != null)
       {
         Console.WriteLine("## 3. Estrutura de dados: polígono - Tecla D");
+        objetoSelecionado.ObjetoRemover();
       }
 
       // ## 4. Estrutura de dados: vértices mover
       // Utilize a posição do mouse junto com a tecla V para mover vértice mais próximo do polígono selecionado.  
       if (estadoTeclado.IsKeyDown(Keys.V) && objetoSelecionado != null)
       {
+        Ponto4D sruPonto = Utilitario.NDC_TelaSRU(ClientSize.X, ClientSize.Y, new Ponto4D(MousePosition.X, MousePosition.Y));
+        objetoSelecionado.PontoMaisPerto(sruPonto, false);
         Console.WriteLine("## 4. Estrutura de dados: vértices mover - Tecla V");
       }
 
@@ -194,7 +206,8 @@ namespace gcgcg
       // Utilize a tecla E para remover o vértice do polígono selecionado mais próximo do ponto do mouse.  
       if (estadoTeclado.IsKeyPressed(Keys.E) && objetoSelecionado != null)
       {
-        Console.WriteLine("## 5. Estrutura de dados: vértices remover - Tecla E");
+        Ponto4D sruPonto = Utilitario.NDC_TelaSRU(ClientSize.X, ClientSize.Y, new Ponto4D(MousePosition.X, MousePosition.Y));
+        objetoSelecionado.PontoMaisPerto(sruPonto, true);
       }
 
       // ## 7. Interação: desenho
@@ -253,12 +266,17 @@ namespace gcgcg
       // Utilize o mouse para clicar na tela com botão direito e poder desenhar um novo polígono.  
       if (MouseState.IsButtonPressed(MouseButton.Right))
       {
-        Console.WriteLine("MouseState.IsButtonDown(MouseButton.Right)");
+        Ponto4D sruPonto = Utilitario.NDC_TelaSRU(ClientSize.X, ClientSize.Y, new Ponto4D(MousePosition.X, MousePosition.Y));
+
+        if (objetoSelecionado == null) {
+          objetoSelecionado = new Poligono(mundo, ref rotuloAtual, new List<Ponto4D>{});
+        }
+
+        
+        sruPonto = objetoSelecionado.MatrizGlobalInversa(sruPonto);
+        objetoSelecionado.PontosAdicionar(sruPonto); 
       }
-      if (MouseState.IsButtonReleased(MouseButton.Right))
-      {
-        Console.WriteLine("MouseState.IsButtonReleased(MouseButton.Right)");
-      }
+      
       // ## 6. Visualização: rastro
       // Exiba o “rasto” ao desenhar os segmentos do polígono.  
       if (MouseState.IsButtonDown(MouseButton.Right))
