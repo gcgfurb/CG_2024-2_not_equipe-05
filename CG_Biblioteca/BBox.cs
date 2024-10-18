@@ -1,7 +1,3 @@
-#define CG_Debug
-#define CG_Gizmo  // debugar gráfico.
-#define CG_OpenGL // render OpenGL.
-
 using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -13,9 +9,10 @@ namespace CG_Biblioteca
     private double menorX, menorY, menorZ, maiorX, maiorY, maiorZ;
     private readonly Ponto4D centro = new();
 
+#if CG_OpenGL
     private int _vertexBufferObject_bbox;
     private int _vertexArrayObject_bbox;
-
+#endif
     private readonly Shader _shaderAmarela;
 
     public BBox()
@@ -47,6 +44,8 @@ namespace CG_Biblioteca
         }
 
         ProcessarCentro();
+
+        AtualizarRender();
       }
     }
 
@@ -70,6 +69,19 @@ namespace CG_Biblioteca
       {
         if (pto.Z > maiorZ) maiorZ = pto.Z;
       }
+    }
+
+    private void AtualizarRender()
+    {
+      float[] _bbox = BBoxConverter();
+
+      _vertexBufferObject_bbox = GL.GenBuffer();
+      GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject_bbox);
+      GL.BufferData(BufferTarget.ArrayBuffer, _bbox.Length * sizeof(float), _bbox, BufferUsageHint.StaticDraw);
+      _vertexArrayObject_bbox = GL.GenVertexArray();
+      GL.BindVertexArray(_vertexArrayObject_bbox);
+      GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+      GL.EnableVertexAttribArray(0);
     }
 
     /// Calcula o ponto do centro da BBox.
@@ -114,28 +126,11 @@ namespace CG_Biblioteca
     /// Obter ponto do centro da BBox.
     public Ponto4D ObterCentro => centro;
 
-#if CG_Gizmo
     public void Desenhar()
     {
-
-#if CG_OpenGL && !CG_DirectX
-
-      float[] _bbox =
-      {
-        (float) menorX,   (float) menorY,   0.0f, // A - canto esquerdo/inferior
-        (float) maiorX,   (float) menorY,   0.0f, // B - canto direito/inferior
-        (float) maiorX,   (float) maiorY,   0.0f, // C - canto direito/superior
-        (float) menorX,   (float) maiorY,   0.0f, // D - canto esquerdo/superior
-        (float) centro.X, (float) centro.Y, 0.0f  // E - centro BBox
-      };
-
-      _vertexBufferObject_bbox = GL.GenBuffer();
-      GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject_bbox);
-      GL.BufferData(BufferTarget.ArrayBuffer, _bbox.Length * sizeof(float), _bbox, BufferUsageHint.StaticDraw);
-      _vertexArrayObject_bbox = GL.GenVertexArray();
-      GL.BindVertexArray(_vertexArrayObject_bbox);
-      GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
-      GL.EnableVertexAttribArray(0);
+#if CG_Gizmo
+#if CG_OpenGL
+      float[] _bbox = BBoxConverter();
 
       GL.BindVertexArray(_vertexArrayObject_bbox);
       var transform = Matrix4.Identity;
@@ -145,18 +140,27 @@ namespace CG_Biblioteca
       GL.DrawArrays(PrimitiveType.LineLoop, 0, ((_bbox.Length - 1) / 3));   // desenha a BBox
       GL.PointSize(10);
       GL.DrawArrays(PrimitiveType.Points, ((_bbox.Length - 1) / 3), 1);     // desenha ponto centro BBox
-
-#elif CG_DirectX && !CG_OpenGL
-      Console.WriteLine(" .. Coloque aqui o seu código em DirectX");
-#elif (CG_DirectX && CG_OpenGL) || (!CG_DirectX && !CG_OpenGL)
-      Console.WriteLine(" .. ERRO de Render - escolha OpenGL ou DirectX !!");
+#endif
 #endif
     }
-#endif
+
+    private float[] BBoxConverter()
+    {
+      float[] _bbox =
+      {
+        (float) menorX,   (float) menorY,   0.0f, // A - canto esquerdo/inferior
+        (float) maiorX,   (float) menorY,   0.0f, // B - canto direito/inferior
+        (float) maiorX,   (float) maiorY,   0.0f, // C - canto direito/superior
+        (float) menorX,   (float) maiorY,   0.0f, // D - canto esquerdo/superior
+        (float) centro.X, (float) centro.Y, 0.0f  // E - centro BBox
+      };
+      return _bbox;
+    }
 
 #if CG_Debug
     public override string ToString()
     {
+      System.Console.WriteLine("__________________________________ \n");
       string retorno;
       retorno = "_____ BBox: \n";
       retorno += "menorX: " + menorX + " - maiorX: " + maiorX + "\n";
@@ -167,6 +171,5 @@ namespace CG_Biblioteca
       return (retorno);
     }
 #endif
-
   }
 }

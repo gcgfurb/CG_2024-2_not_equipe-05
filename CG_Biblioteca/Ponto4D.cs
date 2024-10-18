@@ -1,5 +1,3 @@
-#define CG_Debug
-
 namespace CG_Biblioteca
 {
   /// <summary>
@@ -79,6 +77,7 @@ namespace CG_Biblioteca
 #if CG_Debug
     public override string ToString()
     {
+      System.Console.WriteLine("__________________________________ \n");
       string retorno;
       retorno = "__ Ponto4D: " + "\n";
       retorno += "P" + "[" + string.Format("{0,10}", x) + "," + string.Format("{0,10}", y) + "," + string.Format("{0,10}", z) + "," + string.Format("{0,10}", w) + "]" + "\n";
