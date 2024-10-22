@@ -26,6 +26,16 @@ namespace gcgcg
 
     private List<Ponto4D> pontosNovoPoligono = new();
 
+    private Ponto4D sruPonto = null;
+
+    private Poligono polignoEmAndamento = null;
+
+    private int qtdObjetos = 0;
+
+    private int idxNewPto = 1;
+
+
+
 #if CG_Gizmo
     private readonly float[] _sruEixos =
     [
@@ -175,14 +185,10 @@ namespace gcgcg
       // Quando pressionar a tecla Enter finaliza o desenho do novo polígono.  
       if (estadoTeclado.IsKeyPressed(Keys.Enter))
       {
-        // Cria um novo polígono com os pontos armazenados
-        Objeto novoPoligono = new Poligono(mundo, ref rotuloAtual, pontosNovoPoligono);
-        // Adiciona o novo polígono à cena ou à lista de polígonos
-        grafoLista.Add(novoPoligono.Rotulo, novoPoligono);
-
-        // Limpa a lista de pontos para o próximo polígono
-        pontosNovoPoligono.Clear();
-        objetoSelecionado = null;
+        objetoSelecionado = polignoEmAndamento;
+        qtdObjetos++;
+        polignoEmAndamento = null;
+        idxNewPto = 1;
       }
 
       // ## 3. Estrutura de dados: polígono
@@ -215,17 +221,28 @@ namespace gcgcg
       if (estadoTeclado.IsKeyPressed(Keys.P) && objetoSelecionado != null)
       {
         Console.WriteLine("## 7. Interação: desenho - Tecla P");
+        objetoSelecionado.PrimitivaTipo = (objetoSelecionado.PrimitivaTipo == PrimitiveType.LineStrip) ? PrimitiveType.LineLoop : PrimitiveType.LineStrip;
       }
 
       // ## 8. Interação: cores
       // Utilize o teclado (teclas R=vermelho,G=verde,B=azul) para trocar as cores dos polígonos selecionado.  
-      if (estadoTeclado.IsKeyPressed(Keys.R) && objetoSelecionado != null)  // R=vermelho
+      if (estadoTeclado.IsKeyPressed(Keys.R) && objetoSelecionado != null)
+      { // R=vermelho
         Console.WriteLine("## 8. Interação: cores - vermelho - Tecla R");
-      if (estadoTeclado.IsKeyPressed(Keys.G) && objetoSelecionado != null)  // G=verde
-        Console.WriteLine("## 8. Interação: cores - verde - Tecla G");
-      if (estadoTeclado.IsKeyPressed(Keys.B) && objetoSelecionado != null)  // B=azul
-        Console.WriteLine("## 8. Interação: cores - azul - Tecla B");
+        objetoSelecionado.ShaderObjeto = _shaderVermelha;
+      }
 
+      if (estadoTeclado.IsKeyPressed(Keys.G) && objetoSelecionado != null)
+      { // G=verde
+        Console.WriteLine("## 8. Interação: cores - verde - Tecla G");
+        objetoSelecionado.ShaderObjeto = _shaderVerde;
+      }
+
+      if (estadoTeclado.IsKeyPressed(Keys.B) && objetoSelecionado != null)
+      {  // B=azul
+        Console.WriteLine("## 8. Interação: cores - azul - Tecla B");
+        objetoSelecionado.ShaderObjeto = _shaderAzul;
+      }
       // ## 10. Transformações Geométricas: translação
       // Utilizando as teclas das setas direcionais (cima/baixo,direita,esquerda) movimente o polígono selecionado.  
       if (estadoTeclado.IsKeyPressed(Keys.Left) && objetoSelecionado != null)
@@ -263,29 +280,34 @@ namespace gcgcg
       #region  Mouse
 
       // ## 2. Estrutura de dados: polígono
-      // Utilize o mouse para clicar na tela com botão direito e poder desenhar um novo polígono.  
-      if (MouseState.IsButtonPressed(MouseButton.Right))
-      {
-        Ponto4D sruPonto = Utilitario.NDC_TelaSRU(ClientSize.X, ClientSize.Y, new Ponto4D(MousePosition.X, MousePosition.Y));
+      // Utilize o mouse para clicar na tela com botão direito e poder desenhar um novo polígono.        
+      // if (MouseState.IsButtonPressed(MouseButton.Right)) { }
+      Ponto4D mousePonto = new Ponto4D(MousePosition.X, MousePosition.Y);
+      Ponto4D newPTO = Utilitario.NDC_TelaSRU(ClientSize.X, ClientSize.Y, mousePonto);
 
-        if (objetoSelecionado == null) {
-          objetoSelecionado = new Poligono(mundo, ref rotuloAtual, new List<Ponto4D>{});
-        }
-
-        
-        sruPonto = objetoSelecionado.MatrizGlobalInversa(sruPonto);
-        objetoSelecionado.PontosAdicionar(sruPonto); 
-      }
-      
-      // ## 6. Visualização: rastro
-      // Exiba o “rasto” ao desenhar os segmentos do polígono.  
       if (MouseState.IsButtonDown(MouseButton.Right))
       {
-        Ponto4D sruPonto = Utilitario.NDC_TelaSRU(ClientSize.X, ClientSize.Y, new Ponto4D(MousePosition.X, MousePosition.Y));
-        if (objetoSelecionado != null)
+        sruPonto = newPTO;
+
+        if (polignoEmAndamento != null)
         {
-          sruPonto = objetoSelecionado.MatrizGlobalInversa(sruPonto);
-          objetoSelecionado.PontosAlterar(sruPonto, 0);
+          polignoEmAndamento.PontosAlterar(sruPonto, idxNewPto);
+        }
+        else
+        {
+          List<Ponto4D> pontosPoligono = new List<Ponto4D>();
+          pontosPoligono.Add(sruPonto);
+          pontosPoligono.Add(sruPonto);
+          polignoEmAndamento = CriarNovoPoligono(pontosPoligono);
+        }
+      }
+
+      if (MouseState.IsButtonReleased(MouseButton.Right))
+      {
+        if (polignoEmAndamento != null)
+        {
+          polignoEmAndamento.PontosAdicionar(sruPonto);
+          idxNewPto++;
         }
       }
 
@@ -294,24 +316,37 @@ namespace gcgcg
       // Caso o polígono seja selecionado se deve exibir a sua BBbox, caso contrário a variável objetoSelecionado deve ser "null", e assim nenhum contorno de BBox deve ser exibido.  
       if (MouseState.IsButtonPressed(MouseButton.Left))
       {
-        Console.WriteLine("MouseState.IsButtonPressed(MouseButton.Left)");
-        Console.WriteLine("__ Valores do Espaço de Tela");
-        Console.WriteLine("Vector2i windowSize: " + ClientSize);
-
-        Console.WriteLine("Vector2 mousePosition: " + MousePosition);
-
-        Ponto4D sruPonto = Utilitario.NDC_TelaSRU(ClientSize.X, ClientSize.Y, new Ponto4D(MousePosition.X, MousePosition.Y));
-        Console.WriteLine("Vector2 mousePosition (NDC): " + MousePosition);
-        if (objetoSelecionado != null)
+        for (int i = 0; i <= qtdObjetos; i++)
         {
-          sruPonto = objetoSelecionado.MatrizGlobalInversa(sruPonto);
-          Console.WriteLine("Vector2 mousePosition (Objeto): " + MousePosition);
+          if (objetoSelecionado == null) objetoSelecionado = mundo;
+
+          objetoSelecionado = Grafocena.GrafoCenaProximo(mundo, objetoSelecionado, grafoLista);
+          if (objetoSelecionado != null && objetoSelecionado.Bbox().Dentro(newPTO))
+          {
+            Ponto4D pivoPto = objetoSelecionado.PontosId(0);
+            for (int j = 1; j < objetoSelecionado.PontosListaTamanho; j++)
+            {
+              if (Matematica.ScanLine(newPTO, pivoPto, objetoSelecionado.PontosId(j)))
+              {
+                return;
+              }
+              pivoPto = objetoSelecionado.PontosId(j);
+            }
+          }
         }
+        objetoSelecionado = null;
       }
 
       #endregion
     }
 
+    private Poligono CriarNovoPoligono(List<Ponto4D> pontosPoligono)
+    {
+      // Verifica se o objeto selecionado é nulo e cria o polígono correspondente
+      return objetoSelecionado != null
+          ? new Poligono(objetoSelecionado, ref rotuloAtual, pontosPoligono)
+          : new Poligono(mundo, ref rotuloAtual, pontosPoligono);
+    }
     protected override void OnResize(ResizeEventArgs e)
     {
       base.OnResize(e);
