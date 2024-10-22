@@ -299,6 +299,7 @@ namespace gcgcg
           pontosPoligono.Add(sruPonto);
           pontosPoligono.Add(sruPonto);
           polignoEmAndamento = CriarNovoPoligono(pontosPoligono);
+          grafoLista.Add(polignoEmAndamento.Rotulo, polignoEmAndamento);
         }
       }
 
