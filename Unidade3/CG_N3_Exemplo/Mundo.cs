@@ -2,6 +2,7 @@
  As constantes dos pré-processors estão nos arquivos ".csproj"
  desse projeto e da CG_Biblioteca.
 */
+#define CG_Debug
 
 using CG_Biblioteca;
 using OpenTK.Graphics.OpenGL4;
@@ -197,6 +198,7 @@ namespace gcgcg
       {
         Console.WriteLine("## 3. Estrutura de dados: polígono - Tecla D");
         objetoSelecionado.ObjetoRemover();
+        objetoSelecionado = null;
       }
 
       // ## 4. Estrutura de dados: vértices mover
@@ -246,42 +248,44 @@ namespace gcgcg
       // ## 10. Transformações Geométricas: translação
       // Utilizando as teclas das setas direcionais (cima/baixo,direita,esquerda) movimente o polígono selecionado.  
       if (estadoTeclado.IsKeyPressed(Keys.Left) && objetoSelecionado != null)
-        Console.WriteLine("## 10. Transformações Geométricas: translação - esquerda");
+        objetoSelecionado.MatrizTranslacaoXYZ(-0.05, 0, 0);
       if (estadoTeclado.IsKeyPressed(Keys.Right) && objetoSelecionado != null)
-        Console.WriteLine("## 10. Transformações Geométricas: translação - direita");
+        objetoSelecionado.MatrizTranslacaoXYZ(0.05, 0, 0);
       if (estadoTeclado.IsKeyPressed(Keys.Up) && objetoSelecionado != null)
-        Console.WriteLine("## 10. Transformações Geométricas: translação - cima");
+        objetoSelecionado.MatrizTranslacaoXYZ(0, 0.05, 0);
       if (estadoTeclado.IsKeyPressed(Keys.Down) && objetoSelecionado != null)
-        Console.WriteLine("## 10. Transformações Geométricas: translação - baixo");
+        objetoSelecionado.MatrizTranslacaoXYZ(0, -0.05, 0);
+
       // ## 11. Transformações Geométricas: escala
       // Utilizando as teclas PageUp/PageDown redimensione o polígono selecionado em relação ao SRU.  [TODO: testar]
       if (estadoTeclado.IsKeyPressed(Keys.PageUp) && objetoSelecionado != null)
-        Console.WriteLine("## 11. Transformações Geométricas: escala - PageUp");
+        objetoSelecionado.MatrizEscalaXYZ(1.05, 1.05, 0);
       if (estadoTeclado.IsKeyPressed(Keys.PageDown) && objetoSelecionado != null)
-        Console.WriteLine("## 11. Transformações Geométricas: escala - PageDown");
+        objetoSelecionado.MatrizEscalaXYZ(0.95, 0.95, 0);
       // Utilizando as teclas Home/End redimensione o polígono selecionado em relação ao centro da sua BBox.  [TODO: testar]
       if (estadoTeclado.IsKeyPressed(Keys.Home) && objetoSelecionado != null)
-        Console.WriteLine("## 11. Transformações Geométricas: escala - Home");
+        objetoSelecionado.MatrizEscalaXYZBBox(1.05, 1.05, 0);
       if (estadoTeclado.IsKeyPressed(Keys.End) && objetoSelecionado != null)
-        Console.WriteLine("## 11. Transformações Geométricas: escala - End");
+        objetoSelecionado.MatrizEscalaXYZBBox(0.95, 0.95, 0);
+
       // ## 12. Transformações Geométricas: rotação
       // Utilizando as teclas numéricas 1 e 2 gire o polígono selecionado em relação ao SRU.
-      if (estadoTeclado.IsKeyPressed(Keys.D1) && objetoSelecionado != null)
-        Console.WriteLine("## 12. Transformações Geométricas: rotação - Tecla 1");
+      if (estadoTeclado.IsKeyPressed(Keys.D1) && objetoSelecionado != null) {
+        objetoSelecionado.MatrizRotacao(5);
+      }
       if (estadoTeclado.IsKeyPressed(Keys.D2) && objetoSelecionado != null)
-        Console.WriteLine("## 12. Transformações Geométricas: rotação - Tecla 2");
+        objetoSelecionado.MatrizRotacao(-5);
       // Utilizando as teclas numéricas 3 e 4 gire o polígono selecionado em relação ao centro da sua BBox.
       if (estadoTeclado.IsKeyPressed(Keys.D3) && objetoSelecionado != null)
-        Console.WriteLine("## 12. Transformações Geométricas: rotação - Tecla 3");
+        objetoSelecionado.MatrizRotacaoZBBox(5);
       if (estadoTeclado.IsKeyPressed(Keys.D4) && objetoSelecionado != null)
-        Console.WriteLine("## 12. Transformações Geométricas: rotação - Tecla 4");
+        objetoSelecionado.MatrizRotacaoZBBox(-5);
       #endregion
 
       #region  Mouse
 
       // ## 2. Estrutura de dados: polígono
       // Utilize o mouse para clicar na tela com botão direito e poder desenhar um novo polígono.        
-      // if (MouseState.IsButtonPressed(MouseButton.Right)) { }
       Ponto4D mousePonto = new Ponto4D(MousePosition.X, MousePosition.Y);
       Ponto4D newPTO = Utilitario.NDC_TelaSRU(ClientSize.X, ClientSize.Y, mousePonto);
 
