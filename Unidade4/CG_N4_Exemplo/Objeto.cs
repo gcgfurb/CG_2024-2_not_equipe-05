@@ -10,319 +10,358 @@ using OpenTK.Mathematics;
 
 namespace gcgcg
 {
-  internal class Objeto  // TODO: deveria ser uma class abstract ..??
-  {
-    // Objeto
-    private readonly char rotulo;
-    public char Rotulo { get => rotulo; }
-    protected Objeto paiRef;
-    private List<Objeto> objetosLista = new List<Objeto>();
-    private PrimitiveType primitivaTipo = PrimitiveType.LineLoop;
-    public PrimitiveType PrimitivaTipo { get => primitivaTipo; set => primitivaTipo = value; }
+    internal class Objeto  // TODO: deveria ser uma class abstract ..??
+    {
+        // Objeto
+        private readonly char rotulo;
+        public char Rotulo { get => rotulo; }
+        protected Objeto paiRef;
+        private List<Objeto> objetosLista = new List<Objeto>();
+        private PrimitiveType primitivaTipo = PrimitiveType.LineLoop;
+        public PrimitiveType PrimitivaTipo { get => primitivaTipo; set => primitivaTipo = value; }
     private float primitivaTamanho = 1;
-    public float PrimitivaTamanho { get => primitivaTamanho; set => primitivaTamanho = value; }
-    private Shader _shaderObjeto = new Shader("Shaders/shader.vert", "Shaders/shaderBranca.frag");
-    public Shader shaderCor { set => _shaderObjeto = value; }
+        public float PrimitivaTamanho { get => primitivaTamanho; set => primitivaTamanho = value; }
 
-    // Vértices do objeto TODO: o objeto mundo deveria ter estes atributos abaixo?
-    protected List<Ponto4D> pontosLista = new List<Ponto4D>();
-    private int _vertexBufferObject;
-    private int _vertexArrayObject;
+        public Texture Textura { get; set; } = Texture.LoadFromFile("svg/container.png"); // ("svg/images.jpeg"); // ("svg/luffy.jpg");
 
-    // BBox do objeto
-    private BBox bBox = new BBox();
-    public BBox Bbox()  // TODO: readonly
-    {
-      return bBox;
-    }
+        private Shader _shaderObjeto = new Shader("Shaders/shader.vert", "Shaders/shaderBranca.frag");
+        public Shader shaderCor { set => _shaderObjeto = value; }
 
-    // Transformações do objeto
-    private Transformacao4D matriz = new Transformacao4D();
+        // Vértices do objeto TODO: o objeto mundo deveria ter estes atributos abaixo?
+        protected List<Ponto4D> pontosLista = new List<Ponto4D>();
+        private int _vertexBufferObject;
+        private int _vertexArrayObject;
 
-    /// Matrizes temporarias que sempre sao inicializadas com matriz Identidade entao podem ser "static".
-    private static Transformacao4D matrizTmpTranslacao = new Transformacao4D();
-    private static Transformacao4D matrizTmpTranslacaoInversa = new Transformacao4D();
-    private static Transformacao4D matrizTmpEscala = new Transformacao4D();
-    private static Transformacao4D matrizTmpRotacao = new Transformacao4D();
-    private static Transformacao4D matrizGlobal = new Transformacao4D();
-    private char eixoRotacao = 'z';
-    public void TrocaEixoRotacao(char eixo) => eixoRotacao = eixo;
+        // BBox do objeto
+        private BBox bBox = new BBox();
+        public BBox Bbox()  // TODO: readonly
+        {
+            return bBox;
+        }
+
+        // Transformações do objeto
+        private Transformacao4D matriz = new Transformacao4D();
+
+        /// Matrizes temporarias que sempre sao inicializadas com matriz Identidade entao podem ser "static".
+        private static Transformacao4D matrizTmpTranslacao = new Transformacao4D();
+        private static Transformacao4D matrizTmpTranslacaoInversa = new Transformacao4D();
+        private static Transformacao4D matrizTmpEscala = new Transformacao4D();
+        private static Transformacao4D matrizTmpRotacao = new Transformacao4D();
+        private static Transformacao4D matrizGlobal = new Transformacao4D();
+        private char eixoRotacao = 'z';
+        public void TrocaEixoRotacao(char eixo) => eixoRotacao = eixo;
 
 
-    public Objeto(Objeto _paiRef, ref char _rotulo, Objeto objetoFilho = null)
-    {
-      paiRef = _paiRef;
-      rotulo = _rotulo = Utilitario.CharProximo(_rotulo);
-      if (_paiRef != null)
-      {
-        ObjetoAdicionar(objetoFilho);
-      }
-    }
+        public Objeto(Objeto _paiRef, ref char _rotulo, Objeto objetoFilho = null)
+        {
+            paiRef = _paiRef;
+            rotulo = _rotulo = Utilitario.CharProximo(_rotulo);
+            if (_paiRef != null)
+            {
+                ObjetoAdicionar(objetoFilho);
+            }
+        }
 
-    private void ObjetoAdicionar(Objeto objetoFilho)
-    {
-      if (objetoFilho == null)
-      {
-        paiRef.objetosLista.Add(this);
-      }
-      else
-      {
-        paiRef.FilhoAdicionar(objetoFilho);
-      }
-    }
+        private void ObjetoAdicionar(Objeto objetoFilho)
+        {
+            if (objetoFilho == null)
+            {
+                paiRef.objetosLista.Add(this);
+            }
+            else
+            {
+                paiRef.FilhoAdicionar(objetoFilho);
+            }
+        }
 
-    public void ObjetoAtualizar()
-    {
-      float[] vertices = new float[pontosLista.Count * 3];
-      int ptoLista = 0;
-      for (int i = 0; i < vertices.Length; i += 3)
-      {
-        vertices[i] = (float)pontosLista[ptoLista].X;
-        vertices[i + 1] = (float)pontosLista[ptoLista].Y;
-        vertices[i + 2] = (float)pontosLista[ptoLista].Z;
-        ptoLista++;
-      }
+        public void ObjetoAtualizar()
+        {
+            float[] vertices = new float[pontosLista.Count * 3];
+            int ptoLista = 0;
+            for (int i = 0; i < vertices.Length; i += 3)
+            {
+                vertices[i] = (float)pontosLista[ptoLista].X;
+                vertices[i + 1] = (float)pontosLista[ptoLista].Y;
+                vertices[i + 2] = (float)pontosLista[ptoLista].Z;
+                ptoLista++;
+            }
 
-      GL.PointSize(primitivaTamanho);
+            GL.PointSize(primitivaTamanho);
 
-      _vertexBufferObject = GL.GenBuffer();
-      GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
-      GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
-      _vertexArrayObject = GL.GenVertexArray();
-      GL.BindVertexArray(_vertexArrayObject);
-      GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
-      GL.EnableVertexAttribArray(0);
+            _vertexBufferObject = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
+            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
+            _vertexArrayObject = GL.GenVertexArray();
+            GL.BindVertexArray(_vertexArrayObject);
 
-      bBox.Atualizar(matriz,pontosLista);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+            GL.EnableVertexAttribArray(0);
 
-    }
+            var texCoordLocation = _shaderObjeto.GetAttribLocation("aTexCoord");
+            GL.EnableVertexAttribArray(texCoordLocation);
+            GL.VertexAttribPointer(texCoordLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0); // 3 * sizeof(float));
 
-    // FIXME: quando Classe mundo for Singleton não precisa passar _camera pois posso pegar ponteiro do mundo.
-    public void Desenhar(Transformacao4D matrizGrafo, Camera _camera)
-    {
+
+            //var texCoordLocation = _shaderObjeto.GetAttribLocation("aTexCoord");
+            //GL.EnableVertexAttribArray(texCoordLocation);
+            //GL.VertexAttribPointer(texCoordLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0); // 3 * sizeof(float));
+
+            //Textura = Texture.LoadFromFile("svg/container.png");
+            //Textura.Use(TextureUnit.Texture0);
+
+            bBox.Atualizar(matriz,pontosLista);
+
+        }
+
+        // FIXME: quando Classe mundo for Singleton não precisa passar _camera pois posso pegar ponteiro do mundo.
+        public void Desenhar(Transformacao4D matrizGrafo, Camera _camera)
+        {
 #if CG_OpenGL && !CG_DirectX
-      GL.PointSize(primitivaTamanho);
+            GL.PointSize(primitivaTamanho);
 
-      GL.BindVertexArray(_vertexArrayObject);
+            GL.BindVertexArray(_vertexArrayObject);
 
-      if (paiRef != null)
-      {
-        _shaderObjeto.Use();
+            if (paiRef != null)
+            {
+                _shaderObjeto.Use();
 
-        matrizGrafo = matrizGrafo.MultiplicarMatriz(matriz);
+                //var vertexLocation = _shaderObjeto.GetAttribLocation("aPosition");
+                //GL.EnableVertexAttribArray(vertexLocation);
+                //GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
 
-        //// Atenção: manter a ordem da multiplicação das matrizes: "Model * View * Projeção". 
-        //// Model: matriz ModeltoWorld (também conhecida como modelo)
-        //// View: matriz WorldToView (também conhecida como visualização)
-        //// Projeção: matriz ViewTojectedSpace (também conhecida como projeção)
-        _shaderObjeto.SetMatrix4("model", matrizGrafo.ObterDadosOpenTK());
-        _shaderObjeto.SetMatrix4("view", _camera.GetViewMatrix());
-        _shaderObjeto.SetMatrix4("projection", _camera.GetProjectionMatrix());
+                //var texCoordLocation = _shaderObjeto.GetAttribLocation("aTexCoord");
+                //GL.EnableVertexAttribArray(texCoordLocation);
+                //GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 3 * sizeof(float), 3 * sizeof(float));
 
-        GL.DrawArrays(primitivaTipo, 0, pontosLista.Count);
+                //var vertexLocation = _shaderObjeto.GetAttribLocation("aPosition");
+                //GL.EnableVertexAttribArray(vertexLocation);
+                //GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+
+                // Next, we also setup texture coordinates. It works in much the same way.d
+                //// We add an offset of 3, since the texture coordinates comes after the position data.
+                //// We also change the amount of data to 2 because there's only 2 floats for texture coordinates.
+                var texCoordLocation = _shaderObjeto.GetAttribLocation("aTexCoord");
+                GL.EnableVertexAttribArray(texCoordLocation);
+                GL.VertexAttribPointer(texCoordLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0); // 3 * sizeof(float));
+
+                Textura = Texture.LoadFromFile("svg/container.png");
+                Textura.Use(TextureUnit.Texture0);
+
+                matrizGrafo = matrizGrafo.MultiplicarMatriz(matriz);
+
+                //// Atenção: manter a ordem da multiplicação das matrizes: "Model * View * Projeção". 
+                //// Model: matriz ModeltoWorld (também conhecida como modelo)
+                //// View: matriz WorldToView (também conhecida como visualização)
+                //// Projeção: matriz ViewTojectedSpace (também conhecida como projeção)
+                _shaderObjeto.SetMatrix4("model", matrizGrafo.ObterDadosOpenTK());
+                _shaderObjeto.SetMatrix4("view", _camera.GetViewMatrix());
+                _shaderObjeto.SetMatrix4("projection", _camera.GetProjectionMatrix());
+
+
+                GL.DrawArrays(primitivaTipo, 0, pontosLista.Count);
 #elif CG_DirectX && !CG_OpenGL
       Console.WriteLine(" .. Coloque aqui o seu código em DirectX");
 #elif (CG_DirectX && CG_OpenGL) || (!CG_DirectX && !CG_OpenGL)
       Console.WriteLine(" .. ERRO de Render - escolha OpenGL ou DirectX !!");
 #endif
-      }
-      for (var i = 0; i < objetosLista.Count; i++)
-      {
-        objetosLista[i].Desenhar(matrizGrafo, _camera);
-      }
-    }
-
-    #region Objeto: CRUD
-
-    public void FilhoAdicionar(Objeto filho)
-    {
-      this.objetosLista.Add(filho);
-    }
-
-    public Ponto4D PontosId(int id)
-    {
-      return pontosLista[id];
-    }
-
-    public void PontosAdicionar(Ponto4D pto)
-    {
-      pontosLista.Add(pto);
-      ObjetoAtualizar();
-    }
-
-    public void PontosAlterar(Ponto4D pto, int posicao)
-    {
-      pontosLista[posicao] = pto;
-      ObjetoAtualizar();
-    }
-
-    #endregion
-
-    #region Objeto: Grafo de Cena
-
-    public Objeto GrafocenaBusca(char _rotulo)
-    {
-      if (rotulo == _rotulo)
-      {
-        return this;
-      }
-      foreach (var objeto in objetosLista)
-      {
-        var obj = objeto.GrafocenaBusca(_rotulo);
-        if (obj != null)
-        {
-          return obj;
+            }
+            for (var i = 0; i < objetosLista.Count; i++)
+            {
+                objetosLista[i].Desenhar(matrizGrafo, _camera);
+            }
         }
-      }
-      return null;
-    }
 
-    public Objeto GrafocenaBuscaProximo(Objeto objetoAtual)
-    {
-      objetoAtual = GrafocenaBusca(Utilitario.CharProximo(objetoAtual.rotulo));
-      if (objetoAtual != null)
-      {
-        return objetoAtual;
-      }
-      else
-      {
-        return GrafocenaBusca(Utilitario.CharProximo('@'));
-      }
-    }
+        #region Objeto: CRUD
 
-    public void GrafocenaImprimir(String idt)
-    {
-      Console.WriteLine(idt + rotulo);
-      foreach (var objeto in objetosLista)
-      {
-        objeto.GrafocenaImprimir(idt + "  ");
-      }
-    }
+        public void FilhoAdicionar(Objeto filho)
+        {
+            this.objetosLista.Add(filho);
+        }
 
-    #endregion
+        public Ponto4D PontosId(int id)
+        {
+            return pontosLista[id];
+        }
 
-    #region Objeto: Transformações Geométricas
+        public void PontosAdicionar(Ponto4D pto)
+        {
+            pontosLista.Add(pto);
+            ObjetoAtualizar();
+        }
 
-    public void MatrizImprimir()
-    {
-      Console.WriteLine(matriz);
-    }
-    public void MatrizAtribuirIdentidade()
-    {
-      matriz.AtribuirIdentidade();
-      ObjetoAtualizar();
-    }
-    public void MatrizTranslacaoXYZ(double tx, double ty, double tz)
-    {
-      Transformacao4D matrizTranslate = new Transformacao4D();
-      matrizTranslate.AtribuirTranslacao(tx, ty, tz);
-      matriz = matrizTranslate.MultiplicarMatriz(matriz);
-      ObjetoAtualizar();
-    }
-    public void MatrizEscalaXYZ(double Sx, double Sy, double Sz)
-    {
-      Transformacao4D matrizScale = new Transformacao4D();
-      matrizScale.AtribuirEscala(Sx, Sy, Sz);
-      matriz = matrizScale.MultiplicarMatriz(matriz);
-      ObjetoAtualizar();
-    }
+        public void PontosAlterar(Ponto4D pto, int posicao)
+        {
+            pontosLista[posicao] = pto;
+            ObjetoAtualizar();
+        }
 
-    public void MatrizEscalaXYZBBox(double Sx, double Sy, double Sz)
-    {
-      matrizGlobal.AtribuirIdentidade();
-      Ponto4D pontoPivo = bBox.ObterCentro;
+        #endregion
 
-      matrizTmpTranslacao.AtribuirTranslacao(-pontoPivo.X, -pontoPivo.Y, -pontoPivo.Z); // Inverter sinal
-      matrizGlobal = matrizTmpTranslacao.MultiplicarMatriz(matrizGlobal);
+        #region Objeto: Grafo de Cena
 
-      matrizTmpEscala.AtribuirEscala(Sx, Sy, Sz);
-      matrizGlobal = matrizTmpEscala.MultiplicarMatriz(matrizGlobal);
+        public Objeto GrafocenaBusca(char _rotulo)
+        {
+            if (rotulo == _rotulo)
+            {
+                return this;
+            }
+            foreach (var objeto in objetosLista)
+            {
+                var obj = objeto.GrafocenaBusca(_rotulo);
+                if (obj != null)
+                {
+                    return obj;
+                }
+            }
+            return null;
+        }
 
-      matrizTmpTranslacaoInversa.AtribuirTranslacao(pontoPivo.X, pontoPivo.Y, pontoPivo.Z);
-      matrizGlobal = matrizTmpTranslacaoInversa.MultiplicarMatriz(matrizGlobal);
+        public Objeto GrafocenaBuscaProximo(Objeto objetoAtual)
+        {
+            objetoAtual = GrafocenaBusca(Utilitario.CharProximo(objetoAtual.rotulo));
+            if (objetoAtual != null)
+            {
+                return objetoAtual;
+            }
+            else
+            {
+                return GrafocenaBusca(Utilitario.CharProximo('@'));
+            }
+        }
 
-      matriz = matriz.MultiplicarMatriz(matrizGlobal);
+        public void GrafocenaImprimir(String idt)
+        {
+            Console.WriteLine(idt + rotulo);
+            foreach (var objeto in objetosLista)
+            {
+                objeto.GrafocenaImprimir(idt + "  ");
+            }
+        }
 
-      ObjetoAtualizar();
-    }
-    public void MatrizRotacaoEixo(double angulo)
-    {
-      switch (eixoRotacao)  // TODO: ainda não uso no exemplo
-      {
-        case 'x':
-          matrizTmpRotacao.AtribuirRotacaoX(Transformacao4D.DEG_TO_RAD * angulo);
-          break;
-        case 'y':
-          matrizTmpRotacao.AtribuirRotacaoY(Transformacao4D.DEG_TO_RAD * angulo);
-          break;
-        case 'z':
-          matrizTmpRotacao.AtribuirRotacaoZ(Transformacao4D.DEG_TO_RAD * angulo);
-          break;
-        default:
-          Console.WriteLine("opção de eixoRotacao: ERRADA!");
-          break;
-      }
-      ObjetoAtualizar();
-    }
-    public void MatrizRotacao(double angulo)
-    {
-      MatrizRotacaoEixo(angulo);
-      matriz = matrizTmpRotacao.MultiplicarMatriz(matriz);
-      ObjetoAtualizar();
-    }
-    public void MatrizRotacaoZBBox(double angulo)
-    {
-      matrizGlobal.AtribuirIdentidade();
-      Ponto4D pontoPivo = bBox.ObterCentro;
+        #endregion
 
-      matrizTmpTranslacao.AtribuirTranslacao(-pontoPivo.X, -pontoPivo.Y, -pontoPivo.Z); // Inverter sinal
-      matrizGlobal = matrizTmpTranslacao.MultiplicarMatriz(matrizGlobal);
+        #region Objeto: Transformações Geométricas
 
-      MatrizRotacaoEixo(angulo);
-      matrizGlobal = matrizTmpRotacao.MultiplicarMatriz(matrizGlobal);
+        public void MatrizImprimir()
+        {
+            Console.WriteLine(matriz);
+        }
+        public void MatrizAtribuirIdentidade()
+        {
+            matriz.AtribuirIdentidade();
+            ObjetoAtualizar();
+        }
+        public void MatrizTranslacaoXYZ(double tx, double ty, double tz)
+        {
+            Transformacao4D matrizTranslate = new Transformacao4D();
+            matrizTranslate.AtribuirTranslacao(tx, ty, tz);
+            matriz = matrizTranslate.MultiplicarMatriz(matriz);
+            ObjetoAtualizar();
+        }
+        public void MatrizEscalaXYZ(double Sx, double Sy, double Sz)
+        {
+            Transformacao4D matrizScale = new Transformacao4D();
+            matrizScale.AtribuirEscala(Sx, Sy, Sz);
+            matriz = matrizScale.MultiplicarMatriz(matriz);
+            ObjetoAtualizar();
+        }
 
-      matrizTmpTranslacaoInversa.AtribuirTranslacao(pontoPivo.X, pontoPivo.Y, pontoPivo.Z);
-      matrizGlobal = matrizTmpTranslacaoInversa.MultiplicarMatriz(matrizGlobal);
+        public void MatrizEscalaXYZBBox(double Sx, double Sy, double Sz)
+        {
+            matrizGlobal.AtribuirIdentidade();
+            Ponto4D pontoPivo = bBox.ObterCentro;
 
-      matriz = matriz.MultiplicarMatriz(matrizGlobal);
+            matrizTmpTranslacao.AtribuirTranslacao(-pontoPivo.X, -pontoPivo.Y, -pontoPivo.Z); // Inverter sinal
+            matrizGlobal = matrizTmpTranslacao.MultiplicarMatriz(matrizGlobal);
 
-      ObjetoAtualizar();
-    }
+            matrizTmpEscala.AtribuirEscala(Sx, Sy, Sz);
+            matrizGlobal = matrizTmpEscala.MultiplicarMatriz(matrizGlobal);
 
-    #endregion
+            matrizTmpTranslacaoInversa.AtribuirTranslacao(pontoPivo.X, pontoPivo.Y, pontoPivo.Z);
+            matrizGlobal = matrizTmpTranslacaoInversa.MultiplicarMatriz(matrizGlobal);
 
-    public void OnUnload()
-    {
-      foreach (var objeto in objetosLista)
-      {
-        objeto.OnUnload();
-      }
+            matriz = matriz.MultiplicarMatriz(matrizGlobal);
 
-      GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-      GL.BindVertexArray(0);
-      GL.UseProgram(0);
+            ObjetoAtualizar();
+        }
+        public void MatrizRotacaoEixo(double angulo)
+        {
+            switch (eixoRotacao)  // TODO: ainda não uso no exemplo
+            {
+                case 'x':
+                    matrizTmpRotacao.AtribuirRotacaoX(Transformacao4D.DEG_TO_RAD * angulo);
+                    break;
+                case 'y':
+                    matrizTmpRotacao.AtribuirRotacaoY(Transformacao4D.DEG_TO_RAD * angulo);
+                    break;
+                case 'z':
+                    matrizTmpRotacao.AtribuirRotacaoZ(Transformacao4D.DEG_TO_RAD * angulo);
+                    break;
+                default:
+                    Console.WriteLine("opção de eixoRotacao: ERRADA!");
+                    break;
+            }
+            ObjetoAtualizar();
+        }
+        public void MatrizRotacao(double angulo)
+        {
+            MatrizRotacaoEixo(angulo);
+            matriz = matrizTmpRotacao.MultiplicarMatriz(matriz);
+            ObjetoAtualizar();
+        }
+        public void MatrizRotacaoZBBox(double angulo)
+        {
+            matrizGlobal.AtribuirIdentidade();
+            Ponto4D pontoPivo = bBox.ObterCentro;
 
-      GL.DeleteBuffer(_vertexBufferObject);
-      GL.DeleteVertexArray(_vertexArrayObject);
-    }
+            matrizTmpTranslacao.AtribuirTranslacao(-pontoPivo.X, -pontoPivo.Y, -pontoPivo.Z); // Inverter sinal
+            matrizGlobal = matrizTmpTranslacao.MultiplicarMatriz(matrizGlobal);
+
+            MatrizRotacaoEixo(angulo);
+            matrizGlobal = matrizTmpRotacao.MultiplicarMatriz(matrizGlobal);
+
+            matrizTmpTranslacaoInversa.AtribuirTranslacao(pontoPivo.X, pontoPivo.Y, pontoPivo.Z);
+            matrizGlobal = matrizTmpTranslacaoInversa.MultiplicarMatriz(matrizGlobal);
+
+            matriz = matriz.MultiplicarMatriz(matrizGlobal);
+
+            ObjetoAtualizar();
+        }
+
+        #endregion
+
+        public void OnUnload()
+        {
+            foreach (var objeto in objetosLista)
+            {
+                objeto.OnUnload();
+            }
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindVertexArray(0);
+            GL.UseProgram(0);
+
+            GL.DeleteBuffer(_vertexBufferObject);
+            GL.DeleteVertexArray(_vertexArrayObject);
+        }
 
 #if CG_Debug
-    protected string ImprimeToString()
-    {
-      string retorno;
-      retorno = "__ Objeto: " + rotulo + "\n";
-      for (var i = 0; i < pontosLista.Count; i++)
-      {
-        retorno += "P" + i + "[ " +
-        string.Format("{0,10}", pontosLista[i].X) + " | " +
-        string.Format("{0,10}", pontosLista[i].Y) + " | " +
-        string.Format("{0,10}", pontosLista[i].Z) + " | " +
-        string.Format("{0,10}", pontosLista[i].W) + " ]" + "\n";
-      }
-      retorno += bBox.ToString();
-      return (retorno);
-    }
+        protected string ImprimeToString()
+        {
+            string retorno;
+            retorno = "__ Objeto: " + rotulo + "\n";
+            for (var i = 0; i < pontosLista.Count; i++)
+            {
+                retorno += "P" + i + "[ " +
+                string.Format("{0,10}", pontosLista[i].X) + " | " +
+                string.Format("{0,10}", pontosLista[i].Y) + " | " +
+                string.Format("{0,10}", pontosLista[i].Z) + " | " +
+                string.Format("{0,10}", pontosLista[i].W) + " ]" + "\n";
+            }
+            retorno += bBox.ToString();
+            return (retorno);
+        }
 #endif
 
-  }
+    }
 }

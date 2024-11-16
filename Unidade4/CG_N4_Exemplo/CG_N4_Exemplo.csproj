@@ -12,6 +12,24 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="svg\container.png" />
+    <None Remove="svg\images.jpeg" />
+    <None Remove="svg\luffy.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="svg\container.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="svg\images.jpeg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="svg\luffy.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="OpenTK" Version="4.8.2" />
     <PackageReference Include="StbImageSharp" Version="2.27.14" />
   </ItemGroup>
@@ -21,6 +39,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Shaders\shaderImage.vert">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Shaders\shaderVermelha.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -1,9 +1,12 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Unidade2",
-    "\\Unidade2\\CG_N2_4"
+    "\\CG_Biblioteca",
+    "\\Unidade2\\CG_N2_4",
+    "\\Unidade3\\CG_N3_Exemplo",
+    "\\Unidade4",
+    "\\Unidade4\\CG_N4_Exemplo"
   ],
-  "SelectedNode": "\\Unidade2\\CG_N2_4\\CG_N2_Exemplo.sln",
+  "SelectedNode": "\\Unidade4\\CG_N4_Exemplo\\CG_N4_Exemplo.generated.sln",
   "PreviewInSolutionExplorer": false
 }

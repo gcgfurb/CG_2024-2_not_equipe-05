@@ -16,6 +16,7 @@ namespace CG_Biblioteca
         public Shader(string vertPath, string fragPath)
         {
             var shaderSource = File.ReadAllText(vertPath);
+            Console.WriteLine(shaderSource);
 
             var vertexShader = GL.CreateShader(ShaderType.VertexShader);
 
