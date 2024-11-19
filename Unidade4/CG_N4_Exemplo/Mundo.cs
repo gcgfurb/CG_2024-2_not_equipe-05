@@ -106,7 +106,7 @@ namespace gcgcg
             #endregion
             // objetoSelecionado.MatrizEscalaXYZ(0.2, 0.2, 0.2);
 
-            objetoSelecionado.shaderCor = _shaderAmarela;
+            //objetoSelecionado.shaderCor = _shaderAmarela;
 
             _camera = new Camera(Vector3.UnitZ * 5, ClientSize.X / (float)ClientSize.Y);
         }

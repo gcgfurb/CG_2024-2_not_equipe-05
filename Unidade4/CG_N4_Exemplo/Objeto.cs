@@ -19,10 +19,12 @@ namespace gcgcg
         private List<Objeto> objetosLista = new List<Objeto>();
         private PrimitiveType primitivaTipo = PrimitiveType.LineLoop;
         public PrimitiveType PrimitivaTipo { get => primitivaTipo; set => primitivaTipo = value; }
-    private float primitivaTamanho = 1;
+        private float primitivaTamanho = 1;
         public float PrimitivaTamanho { get => primitivaTamanho; set => primitivaTamanho = value; }
 
-        public Texture Textura { get; set; } = Texture.LoadFromFile("svg/container.png"); // ("svg/images.jpeg"); // ("svg/luffy.jpg");
+        public Texture Textura { get; set; } = Texture.LoadFromFile("Imagem/grupo.png"); // ("svg/images.jpeg"); // ("svg/luffy.jpg");
+        public Texture Textura1 { get; set; } = Texture.LoadFromFile("Imagem/flor.jpg"); // ("svg/images.jpeg"); // ("svg/luffy.jpg");
+
 
         private Shader _shaderObjeto = new Shader("Shaders/shader.vert", "Shaders/shaderBranca.frag");
         public Shader shaderCor { set => _shaderObjeto = value; }
@@ -101,15 +103,7 @@ namespace gcgcg
             GL.EnableVertexAttribArray(texCoordLocation);
             GL.VertexAttribPointer(texCoordLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0); // 3 * sizeof(float));
 
-
-            //var texCoordLocation = _shaderObjeto.GetAttribLocation("aTexCoord");
-            //GL.EnableVertexAttribArray(texCoordLocation);
-            //GL.VertexAttribPointer(texCoordLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0); // 3 * sizeof(float));
-
-            //Textura = Texture.LoadFromFile("svg/container.png");
-            //Textura.Use(TextureUnit.Texture0);
-
-            bBox.Atualizar(matriz,pontosLista);
+            bBox.Atualizar(matriz, pontosLista);
 
         }
 
@@ -125,27 +119,18 @@ namespace gcgcg
             {
                 _shaderObjeto.Use();
 
-                //var vertexLocation = _shaderObjeto.GetAttribLocation("aPosition");
-                //GL.EnableVertexAttribArray(vertexLocation);
-                //GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
-
-                //var texCoordLocation = _shaderObjeto.GetAttribLocation("aTexCoord");
-                //GL.EnableVertexAttribArray(texCoordLocation);
-                //GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 3 * sizeof(float), 3 * sizeof(float));
-
-                //var vertexLocation = _shaderObjeto.GetAttribLocation("aPosition");
-                //GL.EnableVertexAttribArray(vertexLocation);
-                //GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
-
-                // Next, we also setup texture coordinates. It works in much the same way.d
-                //// We add an offset of 3, since the texture coordinates comes after the position data.
-                //// We also change the amount of data to 2 because there's only 2 floats for texture coordinates.
                 var texCoordLocation = _shaderObjeto.GetAttribLocation("aTexCoord");
                 GL.EnableVertexAttribArray(texCoordLocation);
                 GL.VertexAttribPointer(texCoordLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0); // 3 * sizeof(float));
 
-                Textura = Texture.LoadFromFile("svg/container.png");
+                Textura = Texture.LoadFromFile("Imagem/grupo.png");
                 Textura.Use(TextureUnit.Texture0);
+
+                Textura1 = Texture.LoadFromFile("Imagem/flor.jpg");
+                Textura1.Use(TextureUnit.Texture1);
+
+                _shaderObjeto.SetInt("texture0", 0);
+                _shaderObjeto.SetInt("texture1", 1);
 
                 matrizGrafo = matrizGrafo.MultiplicarMatriz(matriz);
 
@@ -157,6 +142,11 @@ namespace gcgcg
                 _shaderObjeto.SetMatrix4("view", _camera.GetViewMatrix());
                 _shaderObjeto.SetMatrix4("projection", _camera.GetProjectionMatrix());
 
+                GL.BindVertexArray(_vertexArrayObject);
+
+                Textura.Use(TextureUnit.Texture0);
+                Textura1.Use(TextureUnit.Texture1);
+                _shaderObjeto.Use();
 
                 GL.DrawArrays(primitivaTipo, 0, pontosLista.Count);
 #elif CG_DirectX && !CG_OpenGL

@@ -12,19 +12,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="svg\container.png" />
-    <None Remove="svg\images.jpeg" />
-    <None Remove="svg\luffy.jpg" />
+    <None Remove="Imagem\container.png" />
+    <None Remove="Imagem\images.jpeg" />
+    <None Remove="Imagem\luffy.jpg" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="svg\container.png">
+    <EmbeddedResource Include="Imagem\container.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="svg\images.jpeg">
+    <EmbeddedResource Include="Imagem\images.jpeg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="svg\luffy.jpg">
+    <EmbeddedResource Include="Imagem\luffy.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
