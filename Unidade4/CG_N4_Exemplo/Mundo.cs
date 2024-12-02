@@ -51,6 +51,9 @@ namespace gcgcg
         private Shader _shaderAmarela;
 
         private Camera _camera;
+    
+        private Cubo _cuboMaior;
+        private Cubo _cuboMenor;
 
         public Mundo(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
                : base(gameWindowSettings, nativeWindowSettings)
@@ -71,7 +74,7 @@ namespace gcgcg
             GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
             GL.Enable(EnableCap.DepthTest);       // Ativar teste de profundidade
-            GL.Enable(EnableCap.CullFace);     // Desenha os dois lados da face
+            // GL.Enable(EnableCap.CullFace);     // Desenha os dois lados da face
                                                // GL.FrontFace(FrontFaceDirection.Cw);
                                                // GL.CullFace(CullFaceMode.FrontAndBack);
 
@@ -101,12 +104,22 @@ namespace gcgcg
             objetoSelecionado.PrimitivaTamanho = 5;
             #endregion
 
-            #region Objeto: Cubo
-            objetoSelecionado = new Cubo(mundo, ref rotuloNovo);
+            #region Objeto: Cubo principal
+            _cuboMaior = new Cubo(mundo, ref rotuloNovo);
             #endregion
-            // objetoSelecionado.MatrizEscalaXYZ(0.2, 0.2, 0.2);
 
-            //objetoSelecionado.shaderCor = _shaderAmarela;
+            #region Objeto: Cubo menor
+            _cuboMenor = new Cubo(_cuboMaior, ref rotuloNovo);
+
+            _cuboMenor.Textura = null;
+            _cuboMenor.Textura = null;
+
+            objetoSelecionado = _cuboMenor;
+            objetoSelecionado.MatrizTranslacaoXYZ(3, 0, 0);
+
+            objetoSelecionado = _cuboMaior;
+
+            #endregion
 
             _camera = new Camera(Vector3.UnitZ * 5, ClientSize.X / (float)ClientSize.Y);
         }
@@ -129,9 +142,16 @@ namespace gcgcg
         {
             base.OnUpdateFrame(e);
 
+            _cuboMenor.MatrizRotacao(.05);
+
             // ☞ 396c2670-8ce0-4aff-86da-0f58cd8dcfdc   TODO: forma otimizada para teclado.
             #region Teclado
             var estadoTeclado = KeyboardState;
+
+            if (!estadoTeclado.IsAnyKeyDown)
+              return;
+
+
             if (estadoTeclado.IsKeyDown(Keys.Escape))
                 Close();
             if (estadoTeclado.IsKeyPressed(Keys.Space))
@@ -151,17 +171,17 @@ namespace gcgcg
             if (estadoTeclado.IsKeyPressed(Keys.I) && objetoSelecionado != null)
                 objetoSelecionado.MatrizAtribuirIdentidade();
             if (estadoTeclado.IsKeyPressed(Keys.Left) && objetoSelecionado != null)
-                objetoSelecionado.MatrizTranslacaoXYZ(-0.05, 0, 0);
+                objetoSelecionado.MatrizTranslacaoXYZ(-0.5, 0, 0);
             if (estadoTeclado.IsKeyPressed(Keys.Right) && objetoSelecionado != null)
-                objetoSelecionado.MatrizTranslacaoXYZ(0.05, 0, 0);
+                objetoSelecionado.MatrizTranslacaoXYZ(0.5, 0, 0);
             if (estadoTeclado.IsKeyPressed(Keys.Up) && objetoSelecionado != null)
-                objetoSelecionado.MatrizTranslacaoXYZ(0, 0.05, 0);
+                objetoSelecionado.MatrizTranslacaoXYZ(0, 0.5, 0);
             if (estadoTeclado.IsKeyPressed(Keys.Down) && objetoSelecionado != null)
-                objetoSelecionado.MatrizTranslacaoXYZ(0, -0.05, 0);
+                objetoSelecionado.MatrizTranslacaoXYZ(0, -0.5, 0);
             if (estadoTeclado.IsKeyPressed(Keys.O) && objetoSelecionado != null)
-                objetoSelecionado.MatrizTranslacaoXYZ(0, 0, 0.05);
+                objetoSelecionado.MatrizTranslacaoXYZ(0, 0, 0.5);
             if (estadoTeclado.IsKeyPressed(Keys.L) && objetoSelecionado != null)
-                objetoSelecionado.MatrizTranslacaoXYZ(0, 0, -0.05);
+                objetoSelecionado.MatrizTranslacaoXYZ(0, 0, -0.5);
             if (estadoTeclado.IsKeyPressed(Keys.PageUp) && objetoSelecionado != null)
                 objetoSelecionado.MatrizEscalaXYZ(2, 2, 2);
             if (estadoTeclado.IsKeyPressed(Keys.PageDown) && objetoSelecionado != null)

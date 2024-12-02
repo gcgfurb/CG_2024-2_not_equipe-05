@@ -23,7 +23,7 @@ namespace gcgcg
         public float PrimitivaTamanho { get => primitivaTamanho; set => primitivaTamanho = value; }
 
         public Texture Textura { get; set; } = Texture.LoadFromFile("Imagem/grupo.png"); // ("svg/images.jpeg"); // ("svg/luffy.jpg");
-        public Texture Textura1 { get; set; } = Texture.LoadFromFile("Imagem/flor.jpg"); // ("svg/images.jpeg"); // ("svg/luffy.jpg");
+        // public Texture Textura1 { get; set; } = Texture.LoadFromFile("Imagem/flor.jpg"); // ("svg/images.jpeg"); // ("svg/luffy.jpg");
 
 
         private Shader _shaderObjeto = new Shader("Shaders/shader.vert", "Shaders/shaderBranca.frag");
@@ -123,12 +123,6 @@ namespace gcgcg
                 GL.EnableVertexAttribArray(texCoordLocation);
                 GL.VertexAttribPointer(texCoordLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0); // 3 * sizeof(float));
 
-                Textura = Texture.LoadFromFile("Imagem/grupo.png");
-                Textura.Use(TextureUnit.Texture0);
-
-                Textura1 = Texture.LoadFromFile("Imagem/flor.jpg");
-                Textura1.Use(TextureUnit.Texture1);
-
                 _shaderObjeto.SetInt("texture0", 0);
                 _shaderObjeto.SetInt("texture1", 1);
 
@@ -144,8 +138,8 @@ namespace gcgcg
 
                 GL.BindVertexArray(_vertexArrayObject);
 
-                Textura.Use(TextureUnit.Texture0);
-                Textura1.Use(TextureUnit.Texture1);
+                // Textura.Use(TextureUnit.Texture0);
+                // Textura1.Use(TextureUnit.Texture1);
                 _shaderObjeto.Use();
 
                 GL.DrawArrays(primitivaTipo, 0, pontosLista.Count);
