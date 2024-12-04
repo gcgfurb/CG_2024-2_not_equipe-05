@@ -24,7 +24,7 @@ namespace gcgcg
 
         public Texture Textura { get; set; }
 
-        private Shader _lampShader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
+        private Shader _lampShader = new Shader("Shaders/shader.vert", "Shaders/lampShader.frag");
         private int _vaoLamp;
         private int _vaoModel;
         private readonly Vector3 _lightPos = new Vector3(1.2f, 1.0f, 2.0f);
@@ -100,31 +100,21 @@ namespace gcgcg
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
             
-            {   
-              _vaoModel = GL.GenVertexArray();
-              GL.BindVertexArray(_vaoModel);
-
-              GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
-              GL.EnableVertexAttribArray(0);
-
-              var texCoordLocation = _shaderObjeto.GetAttribLocation("aTexCoord");
-              GL.EnableVertexAttribArray(texCoordLocation);
-              GL.VertexAttribPointer(texCoordLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0); // 3 * sizeof(float));
-            
-              var normalLocation = _shaderObjeto.GetAttribLocation("gl_Position");
-              GL.EnableVertexAttribArray(normalLocation);
-              GL.VertexAttribPointer(normalLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
-
-            }
-            
-            
             {
-              _vaoLamp = GL.GenVertexArray();
-              GL.BindVertexArray(_vaoLamp);
+                _vaoModel = GL.GenVertexArray();
+                GL.BindVertexArray(_vaoModel);
 
-              var positionLocation = _lampShader.GetAttribLocation("aTexCoord");
-              GL.EnableVertexAttribArray(positionLocation);
-              GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+                GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+                GL.EnableVertexAttribArray(0);
+
+                var texCoordLocation = _shaderObjeto.GetAttribLocation("aTexCoord");
+                GL.EnableVertexAttribArray(texCoordLocation);
+                GL.VertexAttribPointer(texCoordLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0); // 3 * sizeof(float));
+
+                var normalLocation = _shaderObjeto.GetAttribLocation("gl_Position");
+                GL.EnableVertexAttribArray(normalLocation);
+                GL.VertexAttribPointer(normalLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
+
             }
 
             bBox.Atualizar(matriz, pontosLista);
@@ -141,6 +131,9 @@ namespace gcgcg
 
             if (paiRef != null)
             {
+                float[] vertices = new float[pontosLista.Count * 3];
+
+
                 _shaderObjeto.Use();
                 var texCoordLocation = _shaderObjeto.GetAttribLocation("aTexCoord");
 
@@ -158,27 +151,6 @@ namespace gcgcg
                 _shaderObjeto.SetMatrix4("model", matrizGrafo.ObterDadosOpenTK());
                 _shaderObjeto.SetMatrix4("view", _camera.GetViewMatrix());
                 _shaderObjeto.SetMatrix4("projection", _camera.GetProjectionMatrix());
-
-                if (_tipoShader == "BASIC_LIGHT")
-                {
-                    _shaderObjeto.SetVector3("lightPos", _lightPos);
-                    _shaderObjeto.SetVector3("objectColor", new Vector3(1.0f, 0.5f, 0.31f));
-                    _shaderObjeto.SetVector3("lightColor", new Vector3(1.0f, 1.0f, 1.0f));
-
-                    var positionLocation = _lampShader.GetAttribLocation("aTexCoord");
-                    GL.EnableVertexAttribArray(positionLocation);
-
-                    //_lampShader.Use();
-                    //GL.BindVertexArray(_vaoLamp);
-
-                    //Matrix4 lampMatrix = Matrix4.CreateScale(0.2f);
-                    //lampMatrix = lampMatrix * Matrix4.CreateTranslation(_lightPos);
-
-                    //_lampShader.SetMatrix4("model", lampMatrix);
-                    //_lampShader.SetMatrix4("view", _camera.GetViewMatrix());
-                    //_lampShader.SetMatrix4("projection", _camera.GetProjectionMatrix());
-                }
-
 
                 GL.DrawArrays(primitivaTipo, 0, pontosLista.Count);
 #elif CG_DirectX && !CG_OpenGL

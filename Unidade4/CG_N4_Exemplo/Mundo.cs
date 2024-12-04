@@ -53,7 +53,7 @@ namespace gcgcg
         private Shader _shaderCiano;
         private Shader _shaderMagenta;
         private Shader _shaderAmarela;
-        private Shader _lightingShader;
+        private Shader _basicLightingShader;
 
         private Camera _camera;
         private bool _firstMove = true;
@@ -62,6 +62,7 @@ namespace gcgcg
         private Cubo _cuboMaior;
         private Cubo _cuboMenor;
 
+        private IluminacaoAtual _iluminacaoAtual;
 
         public Mundo(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
                : base(gameWindowSettings, nativeWindowSettings)
@@ -99,7 +100,7 @@ namespace gcgcg
 
 
 
-            _lightingShader = new Shader("Shaders/shader.vert", "Shaders/lighting.frag");
+            _basicLightingShader = new Shader("Shaders/basicLightShader.vert", "Shaders/lighting.frag");
             #endregion
 
             #region Eixos: SRU  
@@ -113,30 +114,37 @@ namespace gcgcg
             #endregion
 
             #region Objeto: ponto  
-            objetoSelecionado = new Ponto(mundo, ref rotuloNovo, new Ponto4D(2.0, 0.0));
+            objetoSelecionado = new Ponto(mundo, ref rotuloNovo, new Ponto4D(1.0f, 1.0f, -1.0f));
             objetoSelecionado.PrimitivaTipo = PrimitiveType.Points;
             objetoSelecionado.PrimitivaTamanho = 5;
+            objetoSelecionado.shaderCor = _shaderAmarela;
+
+            objetoSelecionado = new Ponto(mundo, ref rotuloNovo, new Ponto4D(-1.0f, 1.0f, -1.0f));
+            objetoSelecionado.PrimitivaTipo = PrimitiveType.Points;
+            objetoSelecionado.PrimitivaTamanho = 5;
+            objetoSelecionado.shaderCor = _shaderVerde;
+
+            objetoSelecionado = new Ponto(mundo, ref rotuloNovo, new Ponto4D(1.0f, 1.0f, 1.0f));
+            objetoSelecionado.PrimitivaTipo = PrimitiveType.Points;
+            objetoSelecionado.PrimitivaTamanho = 5;
+            objetoSelecionado.shaderCor = _shaderVermelha;
             #endregion
 
             #region Objeto: Cubo principal
             _cuboMaior = new Cubo(mundo, ref rotuloNovo);
             _cuboMaior.shaderCor = _shaderBranca;
             _cuboMaior.Textura = Texture.LoadFromFile("Imagem/grupo.png");
-            _cuboMaior.Textura.Use(TextureUnit.Texture0);
+            //_cuboMaior.Textura.Use(TextureUnit.Texture0);
 
             #endregion
 
             #region Objeto: Cubo menor
             _cuboMenor = new Cubo(_cuboMaior, ref rotuloNovoTeste);
             _cuboMenor.shaderCor = _shaderCuboMenor;
-            _shaderCuboMenor.Use();
             //_cuboMenor.Textura = Texture.LoadFromFile("Imagem/branco.png");
             //_cuboMenor.Textura.Use(TextureUnit.Texture0);
 
-
-
-            objetoSelecionado = _cuboMenor;
-            objetoSelecionado.MatrizTranslacaoXYZ(3, 0, 0);
+            _cuboMenor.MatrizTranslacaoXYZ(4, 0, 0);
 
             objetoSelecionado = _cuboMaior;
 
@@ -148,6 +156,32 @@ namespace gcgcg
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             base.OnRenderFrame(e);
+
+            _cuboMaior.Textura.Use(TextureUnit.Texture0);
+
+            switch(_iluminacaoAtual)
+            {
+                case IluminacaoAtual.BasicLighting:
+
+                    _basicLightingShader.Use();
+                    _basicLightingShader.SetVector3("objectColor", new Vector3(1.0f, 1.0f, 1.0f)); // Cor do objeto
+                    _basicLightingShader.SetVector3("lightColor", new Vector3(1.0f, 1.0f, 1.0f));  // Luz branca
+                    _basicLightingShader.SetVector3("lightPos", new Vector3(1.2f, 1.0f, 2.0f));    // Posição da luz
+
+                    // Atualize as matrizes view e projection
+                    _basicLightingShader.SetMatrix4("view", _camera.GetViewMatrix());
+                    _basicLightingShader.SetMatrix4("projection", _camera.GetProjectionMatrix());
+                    _basicLightingShader.SetMatrix4("model", Matrix4.Identity);
+
+                    // Atualize a posição da câmera
+                    _basicLightingShader.SetVector3("viewPos", _camera.Position);
+
+                    _cuboMaior.shaderCor = _basicLightingShader;
+                    break;
+
+                default:
+                    break;
+            }
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -171,54 +205,53 @@ namespace gcgcg
 
             if (estadoTeclado.IsKeyDown(Keys.Escape))
                 Close();
-            if (estadoTeclado.IsKeyPressed(Keys.Space))
-            {
-                if (objetoSelecionado == null)
-                    objetoSelecionado = mundo;
-                objetoSelecionado.shaderCor = _shaderBranca;
-                objetoSelecionado = mundo.GrafocenaBuscaProximo(objetoSelecionado);
-                objetoSelecionado.shaderCor = _shaderAmarela;
-            }
-            if (estadoTeclado.IsKeyPressed(Keys.G))
-                mundo.GrafocenaImprimir("");
-            if (estadoTeclado.IsKeyPressed(Keys.P) && objetoSelecionado != null)
-                Console.WriteLine(objetoSelecionado.ToString());
-            if (estadoTeclado.IsKeyPressed(Keys.M) && objetoSelecionado != null)
-                objetoSelecionado.MatrizImprimir();
-            if (estadoTeclado.IsKeyPressed(Keys.I) && objetoSelecionado != null)
-                objetoSelecionado.MatrizAtribuirIdentidade();
-            if (estadoTeclado.IsKeyPressed(Keys.Left) && objetoSelecionado != null)
-                objetoSelecionado.MatrizTranslacaoXYZ(-0.5, 0, 0);
-            if (estadoTeclado.IsKeyPressed(Keys.Right) && objetoSelecionado != null)
-                objetoSelecionado.MatrizTranslacaoXYZ(0.5, 0, 0);
-            if (estadoTeclado.IsKeyPressed(Keys.Up) && objetoSelecionado != null)
-                objetoSelecionado.MatrizTranslacaoXYZ(0, 0.5, 0);
-            if (estadoTeclado.IsKeyPressed(Keys.Down) && objetoSelecionado != null)
-                objetoSelecionado.MatrizTranslacaoXYZ(0, -0.5, 0);
-            if (estadoTeclado.IsKeyPressed(Keys.O) && objetoSelecionado != null)
-                objetoSelecionado.MatrizTranslacaoXYZ(0, 0, 0.5);
-            if (estadoTeclado.IsKeyPressed(Keys.L) && objetoSelecionado != null)
-                objetoSelecionado.MatrizTranslacaoXYZ(0, 0, -0.5);
-            if (estadoTeclado.IsKeyPressed(Keys.PageUp) && objetoSelecionado != null)
-                objetoSelecionado.MatrizEscalaXYZ(2, 2, 2);
-            if (estadoTeclado.IsKeyPressed(Keys.PageDown) && objetoSelecionado != null)
-                objetoSelecionado.MatrizEscalaXYZ(0.5, 0.5, 0.5);
-            if (estadoTeclado.IsKeyPressed(Keys.Home) && objetoSelecionado != null)
-                objetoSelecionado.MatrizEscalaXYZBBox(0.5, 0.5, 0.5);
-            if (estadoTeclado.IsKeyPressed(Keys.End) && objetoSelecionado != null)
-                objetoSelecionado.MatrizEscalaXYZBBox(2, 2, 2);
-            // if (estadoTeclado.IsKeyPressed(Keys.D1) && objetoSelecionado != null)
-            //     objetoSelecionado.MatrizRotacao(10);
-            if (estadoTeclado.IsKeyPressed(Keys.D2) && objetoSelecionado != null)
-                objetoSelecionado.MatrizRotacao(-10);
-            if (estadoTeclado.IsKeyPressed(Keys.D3) && objetoSelecionado != null)
-                objetoSelecionado.MatrizRotacaoZBBox(10);
-            if (estadoTeclado.IsKeyPressed(Keys.D4) && objetoSelecionado != null)
-                objetoSelecionado.MatrizRotacaoZBBox(-10);
+            //if (estadoTeclado.IsKeyPressed(Keys.Space))
+            //{
+            //    if (objetoSelecionado == null)
+            //        objetoSelecionado = mundo;
+            //    objetoSelecionado.shaderCor = _shaderBranca;
+            //    objetoSelecionado = mundo.GrafocenaBuscaProximo(objetoSelecionado);
+            //    objetoSelecionado.shaderCor = _shaderAmarela;
+            //}
+            //if (estadoTeclado.IsKeyPressed(Keys.G))
+            //    mundo.GrafocenaImprimir("");
+            //if (estadoTeclado.IsKeyPressed(Keys.P) && objetoSelecionado != null)
+            //    Console.WriteLine(objetoSelecionado.ToString());
+            //if (estadoTeclado.IsKeyPressed(Keys.M) && objetoSelecionado != null)
+            //    objetoSelecionado.MatrizImprimir();
+            //if (estadoTeclado.IsKeyPressed(Keys.I) && objetoSelecionado != null)
+            //    objetoSelecionado.MatrizAtribuirIdentidade();
+            //if (estadoTeclado.IsKeyPressed(Keys.Left) && objetoSelecionado != null)
+            //    objetoSelecionado.MatrizTranslacaoXYZ(-0.5, 0, 0);
+            //if (estadoTeclado.IsKeyPressed(Keys.Right) && objetoSelecionado != null)
+            //    objetoSelecionado.MatrizTranslacaoXYZ(0.5, 0, 0);
+            //if (estadoTeclado.IsKeyPressed(Keys.Up) && objetoSelecionado != null)
+            //    objetoSelecionado.MatrizTranslacaoXYZ(0, 0.5, 0);
+            //if (estadoTeclado.IsKeyPressed(Keys.Down) && objetoSelecionado != null)
+            //    objetoSelecionado.MatrizTranslacaoXYZ(0, -0.5, 0);
+            //if (estadoTeclado.IsKeyPressed(Keys.O) && objetoSelecionado != null)
+            //    objetoSelecionado.MatrizTranslacaoXYZ(0, 0, 0.5);
+            //if (estadoTeclado.IsKeyPressed(Keys.L) && objetoSelecionado != null)
+            //    objetoSelecionado.MatrizTranslacaoXYZ(0, 0, -0.5);
+            //if (estadoTeclado.IsKeyPressed(Keys.PageUp) && objetoSelecionado != null)
+            //    objetoSelecionado.MatrizEscalaXYZ(2, 2, 2);
+            //if (estadoTeclado.IsKeyPressed(Keys.PageDown) && objetoSelecionado != null)
+            //    objetoSelecionado.MatrizEscalaXYZ(0.5, 0.5, 0.5);
+            //if (estadoTeclado.IsKeyPressed(Keys.Home) && objetoSelecionado != null)
+            //    objetoSelecionado.MatrizEscalaXYZBBox(0.5, 0.5, 0.5);
+            //if (estadoTeclado.IsKeyPressed(Keys.End) && objetoSelecionado != null)
+            //    objetoSelecionado.MatrizEscalaXYZBBox(2, 2, 2);
+            //// if (estadoTeclado.IsKeyPressed(Keys.D1) && objetoSelecionado != null)
+            ////     objetoSelecionado.MatrizRotacao(10);
+            //if (estadoTeclado.IsKeyPressed(Keys.D2) && objetoSelecionado != null)
+            //    objetoSelecionado.MatrizRotacao(-10);
+            //if (estadoTeclado.IsKeyPressed(Keys.D3) && objetoSelecionado != null)
+            //    objetoSelecionado.MatrizRotacaoZBBox(10);
+            //if (estadoTeclado.IsKeyPressed(Keys.D4) && objetoSelecionado != null)
+            //    objetoSelecionado.MatrizRotacaoZBBox(-10);
 
             if (estadoTeclado.IsKeyDown(Keys.D1)) {
-                objetoSelecionado.TipoShader = "BASIC_LIGHT";
-                objetoSelecionado.shaderCor = _lightingShader;
+                _iluminacaoAtual = IluminacaoAtual.BasicLighting;
             }
 
             const float cameraSpeed = 1.5f;
@@ -319,7 +352,7 @@ namespace gcgcg
             GL.DeleteProgram(_shaderCiano.Handle);
             GL.DeleteProgram(_shaderMagenta.Handle);
             GL.DeleteProgram(_shaderAmarela.Handle);
-            GL.DeleteProgram(_lightingShader.Handle);
+            GL.DeleteProgram(_basicLightingShader.Handle);
 
 
             base.OnUnload();
@@ -357,5 +390,10 @@ namespace gcgcg
         }
 #endif
 
+    }
+    public enum IluminacaoAtual
+    {
+        Nenhuma,
+        BasicLighting
     }
 }
