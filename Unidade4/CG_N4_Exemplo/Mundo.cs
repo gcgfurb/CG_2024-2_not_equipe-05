@@ -44,6 +44,7 @@ namespace gcgcg
         private int _vertexBufferObject_sruEixos;
         private int _vertexArrayObject_sruEixos;
 
+        private Shader _shaderCuboMaior;
         private Shader _shaderCuboMenor;
 
         private Shader _shaderBranca;
@@ -96,11 +97,11 @@ namespace gcgcg
             _shaderMagenta = new Shader("Shaders/shader.vert", "Shaders/shaderMagenta.frag");
             _shaderAmarela = new Shader("Shaders/shader.vert", "Shaders/shaderAmarela.frag");
 
-            _shaderCuboMenor = _shaderMagenta;//new Shader("Shaders/shader.vert", "Shaders/shaderBranca.frag");
+            _shaderCuboMenor = _shaderAmarela;//new Shader("Shaders/shader.vert", "Shaders/shaderBranca.frag");
+            _shaderCuboMaior = new Shader("Shaders/shader.vert", "Shaders/shaderBranca.frag");
 
 
-
-            _basicLightingShader = new Shader("Shaders/basicLightShader.vert", "Shaders/lighting.frag");
+            _basicLightingShader = new Shader("Shaders/basicLighting.vert", "Shaders/basicLighting.frag");
             #endregion
 
             #region Eixos: SRU  
@@ -134,23 +135,20 @@ namespace gcgcg
             _cuboMaior = new Cubo(mundo, ref rotuloNovo);
             _cuboMaior.shaderCor = _shaderBranca;
             _cuboMaior.Textura = Texture.LoadFromFile("Imagem/grupo.png");
-            //_cuboMaior.Textura.Use(TextureUnit.Texture0);
 
             #endregion
 
             #region Objeto: Cubo menor
             _cuboMenor = new Cubo(_cuboMaior, ref rotuloNovoTeste);
             _cuboMenor.shaderCor = _shaderCuboMenor;
-            //_cuboMenor.Textura = Texture.LoadFromFile("Imagem/branco.png");
-            //_cuboMenor.Textura.Use(TextureUnit.Texture0);
 
             _cuboMenor.MatrizTranslacaoXYZ(4, 0, 0);
 
             objetoSelecionado = _cuboMaior;
 
             #endregion
-
             _camera = new Camera(Vector3.UnitZ * 5, ClientSize.X / (float)ClientSize.Y);
+            CursorState = CursorState.Grabbed;
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -169,7 +167,7 @@ namespace gcgcg
 
                     Ponto4D pontoLuz = _cuboMenor.BBox.ObterCentro;
 
-                    _basicLightingShader.SetVector3("lightPos", new Vector3((float)pontoLuz.x, (float)pontoLuz.y, (float)pontoLuz.z));    // Posição da luz
+                    _basicLightingShader.SetVector3("lightPos", new Vector3((float)pontoLuz.X, (float)pontoLuz.Y, (float)pontoLuz.Z));    // Posição da luz
 
                     // Atualize as matrizes view e projection
                     _basicLightingShader.SetMatrix4("view", _camera.GetViewMatrix());
@@ -180,6 +178,8 @@ namespace gcgcg
                     _basicLightingShader.SetVector3("viewPos", _camera.Position);
 
                     _cuboMaior.shaderCor = _basicLightingShader;
+                    _cuboMaior.Textura.Use(TextureUnit.Texture0);
+
                     break;
 
                 default:
@@ -291,21 +291,6 @@ namespace gcgcg
                 Console.WriteLine("Vector2 mousePosition: " + MousePosition);
                 Console.WriteLine("Vector2i windowSize: " + ClientSize);
             }
-            //if (MouseState.IsButtonDown(MouseButton.Right) && objetoSelecionado != null)
-            //{
-            //    Console.WriteLine("MouseState.IsButtonDown(MouseButton.Right)");
-
-            //    int janelaLargura = ClientSize.X;
-            //    int janelaAltura = ClientSize.Y;
-            //    Ponto4D mousePonto = new Ponto4D(MousePosition.X, MousePosition.Y);
-            //    Ponto4D sruPonto = Utilitario.NDC_TelaSRU(janelaLargura, janelaAltura, mousePonto);
-
-            //    objetoSelecionado.PontosAlterar(sruPonto, 0);
-            //}
-            //if (MouseState.IsButtonReleased(MouseButton.Right))
-            //{
-            //    Console.WriteLine("MouseState.IsButtonReleased(MouseButton.Right)");
-            //}
 
             var mouse = MouseState;
 

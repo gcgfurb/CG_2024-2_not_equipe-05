@@ -114,8 +114,7 @@ namespace gcgcg
 
                 var normalLocation = _shaderObjeto.GetAttribLocation("gl_Position");
                 GL.EnableVertexAttribArray(normalLocation);
-                GL.VertexAttribPointer(normalLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
-
+                GL.VertexAttribPointer(normalLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));  
             }
 
             bBox.Atualizar(matriz, pontosLista);

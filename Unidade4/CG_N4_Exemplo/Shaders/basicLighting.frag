@@ -7,8 +7,14 @@ uniform vec3 lightColor; //The color of the light.
 uniform vec3 lightPos; //The position of the light.
 uniform vec3 viewPos; //The position of the view and/or of the player.
 
+uniform sampler2D texture0;
+uniform sampler2D texture1;
+
 in vec3 Normal; //The normal of the fragment is calculated in the vertex shader.
 in vec3 FragPos; //The fragment position.
+in vec2 texCoord;
+
+out vec4 outputColor;
 
 void main()
 {
@@ -42,4 +48,8 @@ void main()
     
     //Note we still use the light color * object color from the last tutorial.
     //This time the light values are in the phong model (ambient, diffuse and specular)
+
+    outputColor = mix(texture(texture0, texCoord), texture(texture1, texCoord), 0.2);
+
+
 }
