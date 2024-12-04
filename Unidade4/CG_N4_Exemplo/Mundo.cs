@@ -166,7 +166,10 @@ namespace gcgcg
                     _basicLightingShader.Use();
                     _basicLightingShader.SetVector3("objectColor", new Vector3(1.0f, 1.0f, 1.0f)); // Cor do objeto
                     _basicLightingShader.SetVector3("lightColor", new Vector3(1.0f, 1.0f, 1.0f));  // Luz branca
-                    _basicLightingShader.SetVector3("lightPos", new Vector3(1.2f, 1.0f, 2.0f));    // Posição da luz
+
+                    Ponto4D pontoLuz = _cuboMenor.BBox.ObterCentro;
+
+                    _basicLightingShader.SetVector3("lightPos", new Vector3((float)pontoLuz.x, (float)pontoLuz.y, (float)pontoLuz.z));    // Posição da luz
 
                     // Atualize as matrizes view e projection
                     _basicLightingShader.SetMatrix4("view", _camera.GetViewMatrix());
@@ -198,6 +201,7 @@ namespace gcgcg
             base.OnUpdateFrame(e);
 
             _cuboMenor.MatrizRotacao(.005);
+            
 
             // ☞ 396c2670-8ce0-4aff-86da-0f58cd8dcfdc   TODO: forma otimizada para teclado.
             #region Teclado
@@ -287,21 +291,21 @@ namespace gcgcg
                 Console.WriteLine("Vector2 mousePosition: " + MousePosition);
                 Console.WriteLine("Vector2i windowSize: " + ClientSize);
             }
-            if (MouseState.IsButtonDown(MouseButton.Right) && objetoSelecionado != null)
-            {
-                Console.WriteLine("MouseState.IsButtonDown(MouseButton.Right)");
+            //if (MouseState.IsButtonDown(MouseButton.Right) && objetoSelecionado != null)
+            //{
+            //    Console.WriteLine("MouseState.IsButtonDown(MouseButton.Right)");
 
-                int janelaLargura = ClientSize.X;
-                int janelaAltura = ClientSize.Y;
-                Ponto4D mousePonto = new Ponto4D(MousePosition.X, MousePosition.Y);
-                Ponto4D sruPonto = Utilitario.NDC_TelaSRU(janelaLargura, janelaAltura, mousePonto);
+            //    int janelaLargura = ClientSize.X;
+            //    int janelaAltura = ClientSize.Y;
+            //    Ponto4D mousePonto = new Ponto4D(MousePosition.X, MousePosition.Y);
+            //    Ponto4D sruPonto = Utilitario.NDC_TelaSRU(janelaLargura, janelaAltura, mousePonto);
 
-                objetoSelecionado.PontosAlterar(sruPonto, 0);
-            }
-            if (MouseState.IsButtonReleased(MouseButton.Right))
-            {
-                Console.WriteLine("MouseState.IsButtonReleased(MouseButton.Right)");
-            }
+            //    objetoSelecionado.PontosAlterar(sruPonto, 0);
+            //}
+            //if (MouseState.IsButtonReleased(MouseButton.Right))
+            //{
+            //    Console.WriteLine("MouseState.IsButtonReleased(MouseButton.Right)");
+            //}
 
             var mouse = MouseState;
 
@@ -318,6 +322,16 @@ namespace gcgcg
 
                 _camera.Yaw += deltaX * sensitivity;
                 _camera.Pitch -= deltaY * sensitivity;
+
+                //var deltaX = mouse.X - _lastPos.X;
+                //_cuboMaior.TrocaEixoRotacao('y');
+                //_cuboMaior.MatrizRotacaoZBBox(deltaX);
+
+                //var deltaY = mouse.Y - _lastPos.Y;
+                //_cuboMaior.TrocaEixoRotacao('x');
+                //_cuboMaior.MatrizRotacaoZBBox(deltaY);
+
+                //_lastPos = new Vector2(mouse.X, mouse.Y);
             }
 
             #endregion

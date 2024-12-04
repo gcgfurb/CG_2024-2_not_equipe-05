@@ -5,9 +5,9 @@ namespace CG_Biblioteca
   /// </summary>
   public class Ponto4D
   {
-    private double x;
-    private double y;
-    private double z;
+    public double x;
+    public double y;
+    public double z;
     private readonly double w;
     /// <summary>
     /// Instância um ponto 3D com a coordenada homogênea w

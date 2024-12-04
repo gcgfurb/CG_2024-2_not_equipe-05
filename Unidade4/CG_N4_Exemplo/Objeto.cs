@@ -42,6 +42,7 @@ namespace gcgcg
 
         // BBox do objeto
         private BBox bBox = new BBox();
+        public BBox BBox { get => bBox; }
         public BBox Bbox()  // TODO: readonly
         {
             return bBox;
