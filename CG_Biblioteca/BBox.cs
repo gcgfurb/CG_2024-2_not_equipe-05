@@ -80,7 +80,7 @@ namespace CG_Biblioteca
       GL.BufferData(BufferTarget.ArrayBuffer, _bbox.Length * sizeof(float), _bbox, BufferUsageHint.StaticDraw);
       _vertexArrayObject_bbox = GL.GenVertexArray();
       GL.BindVertexArray(_vertexArrayObject_bbox);
-      GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+      GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false,  6 * sizeof(float), 3 * sizeof(float));
       GL.EnableVertexAttribArray(0);
     }
 

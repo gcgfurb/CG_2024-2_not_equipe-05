@@ -27,6 +27,12 @@
     <EmbeddedResource Include="Imagem\luffy.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Imagem\branco.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+	<EmbeddedResource Include="Imagem\grupo.png">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

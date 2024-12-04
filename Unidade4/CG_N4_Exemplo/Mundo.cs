@@ -22,6 +22,8 @@ namespace gcgcg
     {
         private static Objeto mundo = null;
         private char rotuloNovo = '?';
+        private char rotuloNovoTeste = '!';
+
         private Objeto objetoSelecionado = null;
 
         private readonly float[] _sruEixos =
@@ -42,6 +44,8 @@ namespace gcgcg
         private int _vertexBufferObject_sruEixos;
         private int _vertexArrayObject_sruEixos;
 
+        private Shader _shaderCuboMenor;
+
         private Shader _shaderBranca;
         private Shader _shaderVermelha;
         private Shader _shaderVerde;
@@ -49,11 +53,15 @@ namespace gcgcg
         private Shader _shaderCiano;
         private Shader _shaderMagenta;
         private Shader _shaderAmarela;
+        private Shader _lightingShader;
 
         private Camera _camera;
-    
+        private bool _firstMove = true;
+        private Vector2 _lastPos;
+
         private Cubo _cuboMaior;
         private Cubo _cuboMenor;
+
 
         public Mundo(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
                : base(gameWindowSettings, nativeWindowSettings)
@@ -78,7 +86,7 @@ namespace gcgcg
                                                // GL.FrontFace(FrontFaceDirection.Cw);
                                                // GL.CullFace(CullFaceMode.FrontAndBack);
 
-            #region Cores
+            #region Shaders
             _shaderBranca = new Shader("Shaders/shader.vert", "Shaders/shaderBranca.frag");
             _shaderVermelha = new Shader("Shaders/shader.vert", "Shaders/shaderVermelha.frag");
             _shaderVerde = new Shader("Shaders/shader.vert", "Shaders/shaderVerde.frag");
@@ -86,6 +94,12 @@ namespace gcgcg
             _shaderCiano = new Shader("Shaders/shader.vert", "Shaders/shaderCiano.frag");
             _shaderMagenta = new Shader("Shaders/shader.vert", "Shaders/shaderMagenta.frag");
             _shaderAmarela = new Shader("Shaders/shader.vert", "Shaders/shaderAmarela.frag");
+
+            _shaderCuboMenor = _shaderMagenta;//new Shader("Shaders/shader.vert", "Shaders/shaderBranca.frag");
+
+
+
+            _lightingShader = new Shader("Shaders/shader.vert", "Shaders/lighting.frag");
             #endregion
 
             #region Eixos: SRU  
@@ -106,13 +120,20 @@ namespace gcgcg
 
             #region Objeto: Cubo principal
             _cuboMaior = new Cubo(mundo, ref rotuloNovo);
+            _cuboMaior.shaderCor = _shaderBranca;
+            _cuboMaior.Textura = Texture.LoadFromFile("Imagem/grupo.png");
+            _cuboMaior.Textura.Use(TextureUnit.Texture0);
+
             #endregion
 
             #region Objeto: Cubo menor
-            _cuboMenor = new Cubo(_cuboMaior, ref rotuloNovo);
+            _cuboMenor = new Cubo(_cuboMaior, ref rotuloNovoTeste);
+            _cuboMenor.shaderCor = _shaderCuboMenor;
+            _shaderCuboMenor.Use();
+            //_cuboMenor.Textura = Texture.LoadFromFile("Imagem/branco.png");
+            //_cuboMenor.Textura.Use(TextureUnit.Texture0);
 
-            _cuboMenor.Textura = null;
-            _cuboMenor.Textura = null;
+
 
             objetoSelecionado = _cuboMenor;
             objetoSelecionado.MatrizTranslacaoXYZ(3, 0, 0);
@@ -142,15 +163,11 @@ namespace gcgcg
         {
             base.OnUpdateFrame(e);
 
-            _cuboMenor.MatrizRotacao(.05);
+            _cuboMenor.MatrizRotacao(.005);
 
             // ☞ 396c2670-8ce0-4aff-86da-0f58cd8dcfdc   TODO: forma otimizada para teclado.
             #region Teclado
             var estadoTeclado = KeyboardState;
-
-            if (!estadoTeclado.IsAnyKeyDown)
-              return;
-
 
             if (estadoTeclado.IsKeyDown(Keys.Escape))
                 Close();
@@ -190,8 +207,8 @@ namespace gcgcg
                 objetoSelecionado.MatrizEscalaXYZBBox(0.5, 0.5, 0.5);
             if (estadoTeclado.IsKeyPressed(Keys.End) && objetoSelecionado != null)
                 objetoSelecionado.MatrizEscalaXYZBBox(2, 2, 2);
-            if (estadoTeclado.IsKeyPressed(Keys.D1) && objetoSelecionado != null)
-                objetoSelecionado.MatrizRotacao(10);
+            // if (estadoTeclado.IsKeyPressed(Keys.D1) && objetoSelecionado != null)
+            //     objetoSelecionado.MatrizRotacao(10);
             if (estadoTeclado.IsKeyPressed(Keys.D2) && objetoSelecionado != null)
                 objetoSelecionado.MatrizRotacao(-10);
             if (estadoTeclado.IsKeyPressed(Keys.D3) && objetoSelecionado != null)
@@ -199,7 +216,14 @@ namespace gcgcg
             if (estadoTeclado.IsKeyPressed(Keys.D4) && objetoSelecionado != null)
                 objetoSelecionado.MatrizRotacaoZBBox(-10);
 
+            if (estadoTeclado.IsKeyDown(Keys.D1)) {
+                objetoSelecionado.TipoShader = "BASIC_LIGHT";
+                objetoSelecionado.shaderCor = _lightingShader;
+            }
+
             const float cameraSpeed = 1.5f;
+            const float sensitivity = 0.2f;
+
             if (estadoTeclado.IsKeyDown(Keys.Z))
                 _camera.Position = Vector3.UnitZ * 5;
             if (estadoTeclado.IsKeyDown(Keys.W))
@@ -246,6 +270,23 @@ namespace gcgcg
                 Console.WriteLine("MouseState.IsButtonReleased(MouseButton.Right)");
             }
 
+            var mouse = MouseState;
+
+            if (_firstMove)
+            {
+                _lastPos = new Vector2(mouse.X, mouse.Y);
+                _firstMove = false;
+            }
+            else
+            {
+                var deltaX = mouse.X - _lastPos.X;
+                var deltaY = mouse.Y - _lastPos.Y;
+                _lastPos = new Vector2(mouse.X, mouse.Y);
+
+                _camera.Yaw += deltaX * sensitivity;
+                _camera.Pitch -= deltaY * sensitivity;
+            }
+
             #endregion
 
         }
@@ -278,6 +319,8 @@ namespace gcgcg
             GL.DeleteProgram(_shaderCiano.Handle);
             GL.DeleteProgram(_shaderMagenta.Handle);
             GL.DeleteProgram(_shaderAmarela.Handle);
+            GL.DeleteProgram(_lightingShader.Handle);
+
 
             base.OnUnload();
         }

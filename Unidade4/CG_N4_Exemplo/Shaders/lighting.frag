@@ -1,4 +1,4 @@
-#Copiado do projeto https://github.com/opentk/LearnOpenTK/blob/master/Chapter2/2-BasicLighting/Shaders/lighting.frag
+//Copiado do projeto https://github.com/opentk/LearnOpenTK/blob/master/Chapter2/2-BasicLighting/Shaders/lighting.frag
 
 #version 330 core
 out vec4 FragColor;

@@ -22,17 +22,23 @@ namespace gcgcg
         private float primitivaTamanho = 1;
         public float PrimitivaTamanho { get => primitivaTamanho; set => primitivaTamanho = value; }
 
-        public Texture Textura { get; set; } = Texture.LoadFromFile("Imagem/grupo.png"); // ("svg/images.jpeg"); // ("svg/luffy.jpg");
-        // public Texture Textura1 { get; set; } = Texture.LoadFromFile("Imagem/flor.jpg"); // ("svg/images.jpeg"); // ("svg/luffy.jpg");
+        public Texture Textura { get; set; }
+
+        private Shader _lampShader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
+        private int _vaoLamp;
+        private int _vaoModel;
+        private readonly Vector3 _lightPos = new Vector3(1.2f, 1.0f, 2.0f);
 
 
         private Shader _shaderObjeto = new Shader("Shaders/shader.vert", "Shaders/shaderBranca.frag");
         public Shader shaderCor { set => _shaderObjeto = value; }
 
+        private string _tipoShader;
+        public string TipoShader { set => _tipoShader = value; }
+
         // Vértices do objeto TODO: o objeto mundo deveria ter estes atributos abaixo?
         protected List<Ponto4D> pontosLista = new List<Ponto4D>();
         private int _vertexBufferObject;
-        private int _vertexArrayObject;
 
         // BBox do objeto
         private BBox bBox = new BBox();
@@ -93,15 +99,33 @@ namespace gcgcg
             _vertexBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
-            _vertexArrayObject = GL.GenVertexArray();
-            GL.BindVertexArray(_vertexArrayObject);
+            
+            {   
+              _vaoModel = GL.GenVertexArray();
+              GL.BindVertexArray(_vaoModel);
 
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
-            GL.EnableVertexAttribArray(0);
+              GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+              GL.EnableVertexAttribArray(0);
 
-            var texCoordLocation = _shaderObjeto.GetAttribLocation("aTexCoord");
-            GL.EnableVertexAttribArray(texCoordLocation);
-            GL.VertexAttribPointer(texCoordLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0); // 3 * sizeof(float));
+              var texCoordLocation = _shaderObjeto.GetAttribLocation("aTexCoord");
+              GL.EnableVertexAttribArray(texCoordLocation);
+              GL.VertexAttribPointer(texCoordLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0); // 3 * sizeof(float));
+            
+              var normalLocation = _shaderObjeto.GetAttribLocation("gl_Position");
+              GL.EnableVertexAttribArray(normalLocation);
+              GL.VertexAttribPointer(normalLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
+
+            }
+            
+            
+            {
+              _vaoLamp = GL.GenVertexArray();
+              GL.BindVertexArray(_vaoLamp);
+
+              var positionLocation = _lampShader.GetAttribLocation("aTexCoord");
+              GL.EnableVertexAttribArray(positionLocation);
+              GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+            }
 
             bBox.Atualizar(matriz, pontosLista);
 
@@ -113,18 +137,16 @@ namespace gcgcg
 #if CG_OpenGL && !CG_DirectX
             GL.PointSize(primitivaTamanho);
 
-            GL.BindVertexArray(_vertexArrayObject);
+            GL.BindVertexArray(_vaoModel);
 
             if (paiRef != null)
             {
                 _shaderObjeto.Use();
-
                 var texCoordLocation = _shaderObjeto.GetAttribLocation("aTexCoord");
+
+                GL.BindVertexArray(_vaoModel);
                 GL.EnableVertexAttribArray(texCoordLocation);
                 GL.VertexAttribPointer(texCoordLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0); // 3 * sizeof(float));
-
-                _shaderObjeto.SetInt("texture0", 0);
-                _shaderObjeto.SetInt("texture1", 1);
 
                 matrizGrafo = matrizGrafo.MultiplicarMatriz(matriz);
 
@@ -132,15 +154,31 @@ namespace gcgcg
                 //// Model: matriz ModeltoWorld (também conhecida como modelo)
                 //// View: matriz WorldToView (também conhecida como visualização)
                 //// Projeção: matriz ViewTojectedSpace (também conhecida como projeção)
+
                 _shaderObjeto.SetMatrix4("model", matrizGrafo.ObterDadosOpenTK());
                 _shaderObjeto.SetMatrix4("view", _camera.GetViewMatrix());
                 _shaderObjeto.SetMatrix4("projection", _camera.GetProjectionMatrix());
 
-                GL.BindVertexArray(_vertexArrayObject);
+                if (_tipoShader == "BASIC_LIGHT")
+                {
+                    _shaderObjeto.SetVector3("lightPos", _lightPos);
+                    _shaderObjeto.SetVector3("objectColor", new Vector3(1.0f, 0.5f, 0.31f));
+                    _shaderObjeto.SetVector3("lightColor", new Vector3(1.0f, 1.0f, 1.0f));
 
-                // Textura.Use(TextureUnit.Texture0);
-                // Textura1.Use(TextureUnit.Texture1);
-                _shaderObjeto.Use();
+                    var positionLocation = _lampShader.GetAttribLocation("aTexCoord");
+                    GL.EnableVertexAttribArray(positionLocation);
+
+                    //_lampShader.Use();
+                    //GL.BindVertexArray(_vaoLamp);
+
+                    //Matrix4 lampMatrix = Matrix4.CreateScale(0.2f);
+                    //lampMatrix = lampMatrix * Matrix4.CreateTranslation(_lightPos);
+
+                    //_lampShader.SetMatrix4("model", lampMatrix);
+                    //_lampShader.SetMatrix4("view", _camera.GetViewMatrix());
+                    //_lampShader.SetMatrix4("projection", _camera.GetProjectionMatrix());
+                }
+
 
                 GL.DrawArrays(primitivaTipo, 0, pontosLista.Count);
 #elif CG_DirectX && !CG_OpenGL
@@ -326,7 +364,7 @@ namespace gcgcg
             GL.UseProgram(0);
 
             GL.DeleteBuffer(_vertexBufferObject);
-            GL.DeleteVertexArray(_vertexArrayObject);
+            GL.DeleteVertexArray(_vaoModel);
         }
 
 #if CG_Debug

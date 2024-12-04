@@ -70,7 +70,7 @@ namespace gcgcg
 
             Atualizar();
         }
-
+        
         private void Atualizar()
         {
 
