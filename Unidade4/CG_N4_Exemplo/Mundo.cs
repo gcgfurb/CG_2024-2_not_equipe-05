@@ -210,42 +210,42 @@ namespace gcgcg
 
             if (estadoTeclado.IsKeyDown(Keys.Escape))
                 Close();
-            //if (estadoTeclado.IsKeyPressed(Keys.Space))
-            //{
-            //    if (objetoSelecionado == null)
-            //        objetoSelecionado = mundo;
-            //    objetoSelecionado.shaderCor = _shaderBranca;
-            //    objetoSelecionado = mundo.GrafocenaBuscaProximo(objetoSelecionado);
-            //    objetoSelecionado.shaderCor = _shaderAmarela;
-            //}
-            //if (estadoTeclado.IsKeyPressed(Keys.G))
-            //    mundo.GrafocenaImprimir("");
-            //if (estadoTeclado.IsKeyPressed(Keys.P) && objetoSelecionado != null)
-            //    Console.WriteLine(objetoSelecionado.ToString());
-            //if (estadoTeclado.IsKeyPressed(Keys.M) && objetoSelecionado != null)
-            //    objetoSelecionado.MatrizImprimir();
-            //if (estadoTeclado.IsKeyPressed(Keys.I) && objetoSelecionado != null)
-            //    objetoSelecionado.MatrizAtribuirIdentidade();
-            //if (estadoTeclado.IsKeyPressed(Keys.Left) && objetoSelecionado != null)
-            //    objetoSelecionado.MatrizTranslacaoXYZ(-0.5, 0, 0);
-            //if (estadoTeclado.IsKeyPressed(Keys.Right) && objetoSelecionado != null)
-            //    objetoSelecionado.MatrizTranslacaoXYZ(0.5, 0, 0);
-            //if (estadoTeclado.IsKeyPressed(Keys.Up) && objetoSelecionado != null)
-            //    objetoSelecionado.MatrizTranslacaoXYZ(0, 0.5, 0);
-            //if (estadoTeclado.IsKeyPressed(Keys.Down) && objetoSelecionado != null)
-            //    objetoSelecionado.MatrizTranslacaoXYZ(0, -0.5, 0);
-            //if (estadoTeclado.IsKeyPressed(Keys.O) && objetoSelecionado != null)
-            //    objetoSelecionado.MatrizTranslacaoXYZ(0, 0, 0.5);
-            //if (estadoTeclado.IsKeyPressed(Keys.L) && objetoSelecionado != null)
-            //    objetoSelecionado.MatrizTranslacaoXYZ(0, 0, -0.5);
-            //if (estadoTeclado.IsKeyPressed(Keys.PageUp) && objetoSelecionado != null)
-            //    objetoSelecionado.MatrizEscalaXYZ(2, 2, 2);
-            //if (estadoTeclado.IsKeyPressed(Keys.PageDown) && objetoSelecionado != null)
-            //    objetoSelecionado.MatrizEscalaXYZ(0.5, 0.5, 0.5);
-            //if (estadoTeclado.IsKeyPressed(Keys.Home) && objetoSelecionado != null)
-            //    objetoSelecionado.MatrizEscalaXYZBBox(0.5, 0.5, 0.5);
-            //if (estadoTeclado.IsKeyPressed(Keys.End) && objetoSelecionado != null)
-            //    objetoSelecionado.MatrizEscalaXYZBBox(2, 2, 2);
+            if (estadoTeclado.IsKeyPressed(Keys.Space))
+            {
+                if (objetoSelecionado == null)
+                    objetoSelecionado = mundo;
+                objetoSelecionado.shaderCor = _shaderBranca;
+                objetoSelecionado = mundo.GrafocenaBuscaProximo(objetoSelecionado);
+                objetoSelecionado.shaderCor = _shaderAmarela;
+            }
+            if (estadoTeclado.IsKeyPressed(Keys.G))
+                mundo.GrafocenaImprimir("");
+            if (estadoTeclado.IsKeyPressed(Keys.P) && objetoSelecionado != null)
+                Console.WriteLine(objetoSelecionado.ToString());
+            if (estadoTeclado.IsKeyPressed(Keys.M) && objetoSelecionado != null)
+                objetoSelecionado.MatrizImprimir();
+            if (estadoTeclado.IsKeyPressed(Keys.I) && objetoSelecionado != null)
+                objetoSelecionado.MatrizAtribuirIdentidade();
+            if (estadoTeclado.IsKeyPressed(Keys.Left) && objetoSelecionado != null)
+                objetoSelecionado.MatrizTranslacaoXYZ(-0.5, 0, 0);
+            if (estadoTeclado.IsKeyPressed(Keys.Right) && objetoSelecionado != null)
+                objetoSelecionado.MatrizTranslacaoXYZ(0.5, 0, 0);
+            if (estadoTeclado.IsKeyPressed(Keys.Up) && objetoSelecionado != null)
+                objetoSelecionado.MatrizTranslacaoXYZ(0, 0.5, 0);
+            if (estadoTeclado.IsKeyPressed(Keys.Down) && objetoSelecionado != null)
+                objetoSelecionado.MatrizTranslacaoXYZ(0, -0.5, 0);
+            if (estadoTeclado.IsKeyPressed(Keys.O) && objetoSelecionado != null)
+                objetoSelecionado.MatrizTranslacaoXYZ(0, 0, 0.5);
+            if (estadoTeclado.IsKeyPressed(Keys.L) && objetoSelecionado != null)
+                objetoSelecionado.MatrizTranslacaoXYZ(0, 0, -0.5);
+            if (estadoTeclado.IsKeyPressed(Keys.PageUp) && objetoSelecionado != null)
+                objetoSelecionado.MatrizEscalaXYZ(2, 2, 2);
+            if (estadoTeclado.IsKeyPressed(Keys.PageDown) && objetoSelecionado != null)
+                objetoSelecionado.MatrizEscalaXYZ(0.5, 0.5, 0.5);
+            if (estadoTeclado.IsKeyPressed(Keys.Home) && objetoSelecionado != null)
+                objetoSelecionado.MatrizEscalaXYZBBox(0.5, 0.5, 0.5);
+            if (estadoTeclado.IsKeyPressed(Keys.End) && objetoSelecionado != null)
+                objetoSelecionado.MatrizEscalaXYZBBox(2, 2, 2);
             //// if (estadoTeclado.IsKeyPressed(Keys.D1) && objetoSelecionado != null)
             ////     objetoSelecionado.MatrizRotacao(10);
             //if (estadoTeclado.IsKeyPressed(Keys.D2) && objetoSelecionado != null)

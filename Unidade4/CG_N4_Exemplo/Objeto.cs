@@ -24,17 +24,10 @@ namespace gcgcg
 
         public Texture Textura { get; set; }
 
-        private Shader _lampShader = new Shader("Shaders/shader.vert", "Shaders/lampShader.frag");
-        private int _vaoLamp;
         private int _vaoModel;
-        private readonly Vector3 _lightPos = new Vector3(1.2f, 1.0f, 2.0f);
-
 
         private Shader _shaderObjeto = new Shader("Shaders/shader.vert", "Shaders/shaderBranca.frag");
-        public Shader shaderCor { set => _shaderObjeto = value; }
-
-        private string _tipoShader;
-        public string TipoShader { set => _tipoShader = value; }
+        public Shader shaderCor { get => _shaderObjeto; set => _shaderObjeto = value; }
 
         // Vértices do objeto TODO: o objeto mundo deveria ter estes atributos abaixo?
         protected List<Ponto4D> pontosLista = new List<Ponto4D>();
