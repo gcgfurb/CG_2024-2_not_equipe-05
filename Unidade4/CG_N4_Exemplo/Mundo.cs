@@ -183,6 +183,7 @@ namespace gcgcg
                     break;
 
                 default:
+                    _cuboMaior.shaderCor = _shaderCuboMaior;
                     break;
             }
 
@@ -256,6 +257,10 @@ namespace gcgcg
 
             if (estadoTeclado.IsKeyDown(Keys.D1)) {
                 _iluminacaoAtual = IluminacaoAtual.BasicLighting;
+            }
+            if (estadoTeclado.IsKeyDown(Keys.D0))
+            {
+                _iluminacaoAtual = IluminacaoAtual.Nenhuma;
             }
 
             const float cameraSpeed = 1.5f;
